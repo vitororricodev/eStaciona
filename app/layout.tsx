@@ -1,5 +1,6 @@
 import './globals.css';
 import { PwaRegister } from '@/components/PwaRegister';
+import { AppSplash } from '@/components/AppSplash';
 import type { Metadata, Viewport } from 'next';
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
-      <body><PwaRegister />{children}</body>
+      <body><AppSplash /><PwaRegister />{children}</body>
     </html>
   );
 }

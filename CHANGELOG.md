@@ -1,4 +1,11 @@
 # Changelog
+## 1.0.9
+- Harmonização da marca com ícone maior e proporções refinadas.
+- Landing page revisada com hierarquia, contraste, espaçamento e profundidade visual aprimorados.
+- Microanimações sutis de entrada respeitando `prefers-reduced-motion`.
+- Splash screen animada exibida uma vez por sessão.
+- Tema claro/escuro preservado e integrado à nova apresentação visual.
+
 
 ## 1.0.4
 - Corrige tipagem de cookies do Supabase em `lib/supabase/server.ts` e `middleware.ts`.

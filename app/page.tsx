@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { CarFront, Gauge, QrCode, ArrowRight, Smartphone } from 'lucide-react';
+import { ArrowRight, CarFront, Gauge, QrCode, Smartphone } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
+import { ThemeToggle } from '@/components/ThemeToggle';
 import { createClient } from '@/lib/supabase/server';
 
 export default async function Home() {
@@ -22,85 +23,152 @@ export default async function Home() {
     : '/login';
 
   return (
-    <main className="min-h-screen overflow-hidden bg-gradient-to-b from-brand-50 via-white to-white px-6 py-10 dark:from-slate-950 dark:via-slate-950 dark:to-slate-900 sm:py-14">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-14 flex items-center justify-between">
-          <BrandLogo />
-          <Link
-            href={primaryHref}
-            className="rounded-2xl bg-white px-4 py-2.5 text-sm font-bold text-brand-700 shadow-sm ring-1 ring-brand-100 transition hover:ring-brand-300 dark:bg-slate-900 dark:text-brand-300 dark:ring-slate-700"
-          >
-            {user ? (mustChangePassword ? 'Alterar senha' : 'Operação') : 'Entrar'}
-          </Link>
-        </div>
+    <main className="home-shell relative min-h-screen overflow-hidden bg-[#f8fcff] text-slate-950 dark:bg-[#020817] dark:text-white">
+      <div className="home-orb home-orb-one" />
+      <div className="home-orb home-orb-two" />
+      <div className="home-arc home-arc-one" />
+      <div className="home-arc home-arc-two" />
 
-        <section className="grid items-center gap-10 lg:grid-cols-[1.1fr_.9fr]">
-          <div className="max-w-3xl">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-brand-100 bg-white px-4 py-2 text-sm font-bold text-brand-700 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:text-brand-300">
-              <Smartphone size={16}/> Mobile-first para estacionamentos
+      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-7 sm:px-8 sm:pt-9 lg:px-10">
+        <header className="home-enter home-enter-1 flex items-center justify-between gap-4">
+          <BrandLogo size="lg" />
+          <div className="flex items-center gap-2 sm:gap-3">
+            <ThemeToggle />
+            <Link
+              href={primaryHref}
+              className="group inline-flex items-center gap-2 rounded-2xl border border-brand-200/80 bg-white/90 px-4 py-2.5 text-sm font-black text-brand-700 shadow-[0_10px_30px_rgba(24,119,248,0.10)] backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-[0_14px_34px_rgba(24,119,248,0.16)] dark:border-slate-700 dark:bg-slate-900/90 dark:text-brand-300"
+            >
+              {user ? (mustChangePassword ? 'Alterar senha' : 'Operação') : 'Entrar'}
+              <ArrowRight size={16} className="transition-transform group-hover:translate-x-0.5" />
+            </Link>
+          </div>
+        </header>
+
+        <section className="grid min-h-[calc(100vh-150px)] items-center gap-12 py-12 lg:grid-cols-[1.02fr_.98fr] lg:gap-16 lg:py-10">
+          <div className="home-enter home-enter-2 max-w-3xl">
+            <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-brand-200/70 bg-white/80 px-4 py-2.5 text-sm font-black text-brand-700 shadow-[0_8px_28px_rgba(24,119,248,0.08)] backdrop-blur dark:border-slate-700 dark:bg-slate-900/75 dark:text-brand-300">
+              <span className="grid h-7 w-7 place-items-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-500/15 dark:text-brand-300">
+                <Smartphone size={14} />
+              </span>
+              Mobile-first para estacionamentos
             </div>
-            <h1 className="text-5xl font-black tracking-[-0.05em] text-slate-950 dark:text-white sm:text-7xl">
-              Seu pátio.<br/><span className="bg-gradient-to-r from-brand-700 to-brand-400 bg-clip-text text-transparent dark:from-brand-400 dark:to-sky-300">Na palma da mão.</span>
+
+            <h1 className="max-w-[760px] text-[3.4rem] font-black leading-[.88] tracking-[-0.065em] text-[#06132f] dark:text-white sm:text-[5rem] lg:text-[5.55rem] xl:text-[6.15rem]">
+              Seu pátio.
+              <span className="mt-2 block bg-gradient-to-r from-[#0c6ff2] via-[#208df8] to-[#49b7ff] bg-clip-text pb-2 text-transparent">
+                Na palma da mão.
+              </span>
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 dark:text-slate-300">Entrada rápida, cobrança por tempo, acompanhamento pelo cliente e gestão em uma única plataforma.</p>
-            <div className="mt-7 flex flex-wrap gap-3">
+
+            <p className="mt-7 max-w-2xl text-base font-medium leading-8 text-slate-600 dark:text-slate-300 sm:text-lg">
+              Entrada rápida, cobrança por tempo, acompanhamento pelo cliente e gestão em uma única plataforma.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
               {user ? (
                 <>
-                  <Link href={mustChangePassword ? '/alterar-senha' : '/operacao'} className="inline-flex items-center gap-2 rounded-2xl bg-brand-700 px-5 py-3 font-bold text-white shadow-brand transition hover:bg-brand-800">
-                    {mustChangePassword ? 'Alterar senha' : 'Abrir operação'} <ArrowRight size={18}/>
+                  <Link
+                    href={mustChangePassword ? '/alterar-senha' : '/operacao'}
+                    className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-brand-700 to-brand-500 px-5 py-3.5 font-black text-white shadow-[0_14px_35px_rgba(24,119,248,0.28)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(24,119,248,0.34)]"
+                  >
+                    {mustChangePassword ? 'Alterar senha' : 'Abrir operação'}
+                    <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
                   </Link>
                   {!mustChangePassword && (
-                    <Link href="/admin" className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 font-bold text-slate-700 ring-1 ring-slate-200 transition hover:ring-brand-200 dark:bg-slate-900 dark:text-slate-200 dark:ring-slate-700">Ver gestão</Link>
+                    <Link
+                      href="/admin"
+                      className="inline-flex items-center gap-2 rounded-2xl border border-slate-200 bg-white/90 px-5 py-3.5 font-black text-slate-700 shadow-sm backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-brand-300 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-200"
+                    >
+                      Ver gestão
+                    </Link>
                   )}
                 </>
               ) : (
-                <Link href="/login" className="inline-flex items-center gap-2 rounded-2xl bg-brand-700 px-5 py-3 font-bold text-white shadow-brand transition hover:bg-brand-800">Entrar no eStaciona <ArrowRight size={18}/></Link>
+                <Link
+                  href="/login"
+                  className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-brand-700 to-brand-500 px-5 py-3.5 font-black text-white shadow-[0_14px_35px_rgba(24,119,248,0.28)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(24,119,248,0.34)]"
+                >
+                  Entrar no eStaciona
+                  <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                </Link>
               )}
             </div>
           </div>
 
-          <div className="relative hidden lg:block">
-            <div className="absolute -right-10 -top-10 h-64 w-64 rounded-full bg-brand-200/50 blur-3xl dark:bg-brand-700/20"/>
-            <div className="relative rounded-[2.5rem] border border-white/80 bg-white/80 p-6 shadow-soft backdrop-blur dark:border-slate-700 dark:bg-slate-900/80">
-              <p className="text-xs font-black tracking-[.18em] text-brand-600 dark:text-brand-300">eSTACIONA</p>
-              <p className="mt-2 text-2xl font-black text-slate-950 dark:text-white">3 fluxos. 1 operação conectada.</p>
-              <div className="mt-6 space-y-3">
-                <Flow icon={<CarFront/>} title="Operação" text="Entrada e cobrança em poucos toques."/>
-                <Flow icon={<QrCode/>} title="Cliente" text="Tempo, valor atual e QR no celular."/>
-                <Flow icon={<Gauge/>} title="Gestão" text="Indicadores e controle do negócio."/>
+          <div className="home-enter home-enter-3 relative mx-auto w-full max-w-[620px]">
+            <div className="absolute -inset-8 rounded-[4rem] bg-gradient-to-br from-brand-300/20 via-sky-200/10 to-transparent blur-3xl dark:from-brand-500/10 dark:via-sky-500/5" />
+            <div className="relative overflow-hidden rounded-[2.4rem] border border-white/90 bg-white/80 p-5 shadow-[0_30px_80px_rgba(17,88,160,0.14)] backdrop-blur-xl dark:border-slate-700/80 dark:bg-slate-900/80 sm:p-7 lg:p-8">
+              <div className="absolute -right-20 -top-24 h-56 w-56 rounded-full border-[34px] border-brand-100/70 dark:border-brand-500/5" />
+              <div className="absolute -right-8 -top-10 h-28 w-28 rounded-full bg-brand-200/30 blur-2xl dark:bg-brand-500/10" />
+
+              <div className="relative">
+                <p className="text-xs font-black tracking-[.2em] text-brand-600 dark:text-brand-300">eSTACIONA</p>
+                <h2 className="mt-3 text-2xl font-black tracking-[-0.035em] text-[#06132f] dark:text-white sm:text-3xl">
+                  3 fluxos. 1 operação conectada.
+                </h2>
+
+                <div className="mt-7 space-y-3.5">
+                  <Flow icon={<CarFront />} title="Operação" text="Entrada e cobrança em poucos toques." />
+                  <Flow icon={<QrCode />} title="Cliente" text="Tempo, valor atual e QR no celular." />
+                  <Flow icon={<Gauge />} title="Gestão" text="Indicadores e controle do negócio." />
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        <div className="mt-16 grid gap-5 md:grid-cols-3">
+        <section className="home-enter home-enter-4 grid gap-4 pb-4 md:grid-cols-3">
           {user && !mustChangePassword ? (
             <>
-              <ModuleLink href="/operacao" icon={<CarFront/>} title="Operação" text="Entrada, cobrança e veículos no pátio."/>
-              <ModuleLink href="/consultar" icon={<QrCode/>} title="Cliente" text="Consulta segura por placa, tempo, valor e QR."/>
-              <ModuleLink href="/admin" icon={<Gauge/>} title="Gestão" text="Indicadores, movimentações e tarifas."/>
+              <ModuleLink href="/operacao" icon={<CarFront />} title="Operação" text="Entrada, cobrança e veículos no pátio." />
+              <ModuleLink href="/consultar" icon={<QrCode />} title="Cliente" text="Consulta segura por placa, tempo, valor e QR." />
+              <ModuleLink href="/admin" icon={<Gauge />} title="Gestão" text="Indicadores, movimentações e tarifas." />
             </>
           ) : (
             <>
-              <ModuleCard icon={<CarFront/>} title="Operação" text="Entrada, cobrança e veículos no pátio."/>
-              <ModuleCard icon={<QrCode/>} title="Cliente" text="Consulta segura por placa, tempo, valor e QR."/>
-              <ModuleCard icon={<Gauge/>} title="Gestão" text="Indicadores, movimentações e tarifas."/>
+              <ModuleCard icon={<CarFront />} title="Operação" text="Entrada, cobrança e veículos no pátio." />
+              <ModuleCard icon={<QrCode />} title="Cliente" text="Consulta segura por placa, tempo, valor e QR." />
+              <ModuleCard icon={<Gauge />} title="Gestão" text="Indicadores, movimentações e tarifas." />
             </>
           )}
-        </div>
+        </section>
       </div>
     </main>
   );
 }
 
-function Flow({icon,title,text}:{icon:React.ReactNode;title:string;text:string}){
-  return <div className="flex items-center gap-4 rounded-3xl bg-brand-50/80 p-4 dark:bg-slate-800/80"><span className="grid h-11 w-11 place-items-center rounded-2xl bg-white text-brand-700 shadow-sm dark:bg-slate-950 dark:text-brand-300">{icon}</span><div><p className="font-black text-slate-950 dark:text-white">{title}</p><p className="text-sm text-slate-500 dark:text-slate-300">{text}</p></div></div>
+function Flow({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="flow-row group flex items-center gap-4 rounded-[1.65rem] border border-white/70 bg-[#edf8ff]/80 p-4 transition duration-300 hover:-translate-y-0.5 hover:border-brand-200 hover:bg-white dark:border-slate-700/70 dark:bg-slate-800/70 dark:hover:border-brand-500/30 dark:hover:bg-slate-800 sm:p-5">
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-white text-brand-600 shadow-[0_8px_24px_rgba(24,119,248,0.10)] dark:bg-slate-950 dark:text-brand-300">
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="font-black text-[#06132f] dark:text-white sm:text-lg">{title}</p>
+        <p className="mt-0.5 text-sm leading-6 text-slate-500 dark:text-slate-300 sm:text-base">{text}</p>
+      </div>
+      <ArrowRight size={18} className="shrink-0 text-brand-500/80 transition-transform duration-300 group-hover:translate-x-1" />
+    </div>
+  );
 }
 
-function ModuleLink({href,icon,title,text}:{href:string;icon:React.ReactNode;title:string;text:string}){
-  return <Link href={href} className="group rounded-3xl border border-brand-100 bg-white p-7 shadow-soft transition hover:-translate-y-1 hover:border-brand-300 dark:border-slate-700 dark:bg-slate-900"><span className="mb-5 inline-grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-brand-300">{icon}</span><h2 className="text-xl font-black text-slate-950 dark:text-white">{title}</h2><p className="mt-2 text-slate-500 dark:text-slate-300">{text}</p><ArrowRight className="mt-5 text-brand-600 transition group-hover:translate-x-1 dark:text-brand-300"/></Link>
+function ModuleLink({ href, icon, title, text }: { href: string; icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <Link href={href} className="group rounded-[1.8rem] border border-brand-100 bg-white/70 p-6 shadow-[0_18px_50px_rgba(17,88,160,0.08)] backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-brand-300 hover:bg-white dark:border-slate-800 dark:bg-slate-900/70">
+      <span className="mb-4 inline-grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">{icon}</span>
+      <h2 className="text-lg font-black text-[#06132f] dark:text-white">{title}</h2>
+      <p className="mt-1.5 text-sm leading-6 text-slate-500 dark:text-slate-300">{text}</p>
+      <ArrowRight className="mt-4 text-brand-600 transition-transform group-hover:translate-x-1 dark:text-brand-300" size={18} />
+    </Link>
+  );
 }
 
-function ModuleCard({icon,title,text}:{icon:React.ReactNode;title:string;text:string}){
-  return <div className="rounded-3xl border border-brand-100 bg-white p-7 shadow-soft dark:border-slate-700 dark:bg-slate-900"><span className="mb-5 inline-grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-slate-800 dark:text-brand-300">{icon}</span><h2 className="text-xl font-black text-slate-950 dark:text-white">{title}</h2><p className="mt-2 text-slate-500 dark:text-slate-300">{text}</p></div>
+function ModuleCard({ icon, title, text }: { icon: React.ReactNode; title: string; text: string }) {
+  return (
+    <div className="rounded-[1.8rem] border border-brand-100 bg-white/70 p-6 shadow-[0_18px_50px_rgba(17,88,160,0.06)] backdrop-blur dark:border-slate-800 dark:bg-slate-900/70">
+      <span className="mb-4 inline-grid h-11 w-11 place-items-center rounded-2xl bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300">{icon}</span>
+      <h2 className="text-lg font-black text-[#06132f] dark:text-white">{title}</h2>
+      <p className="mt-1.5 text-sm leading-6 text-slate-500 dark:text-slate-300">{text}</p>
+    </div>
+  );
 }
