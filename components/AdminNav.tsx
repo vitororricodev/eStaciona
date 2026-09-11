@@ -1,0 +1,3 @@
+import Link from 'next/link';
+const items=[['/admin','Dashboard'],['/admin/movimentacoes','Movimentações'],['/admin/relatorios','Relatórios'],['/admin/clientes','Clientes'],['/admin/tarifas','Tarifas'],['/admin/servicos','Serviços'],['/admin/equipe','Equipe'],['/admin/auditoria','Auditoria']];
+export function AdminNav(){return <nav className="mb-6 flex gap-2 overflow-x-auto pb-1">{items.map(([href,label])=><Link key={href} href={href} className="whitespace-nowrap rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 hover:border-brand-200 hover:text-brand-700">{label}</Link>)}</nav>}
