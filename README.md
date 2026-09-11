@@ -93,13 +93,14 @@ Execute **nesta ordem** em um projeto Supabase novo:
 1. `supabase/migrations/001_initial.sql`
 2. `supabase/migrations/002_tariffs_advanced.sql`
 3. `supabase/migrations/003_mvp_complete.sql`
+4. `supabase/migrations/004_hardening.sql`
 
-Em uma instalação 0.4.0 existente, execute somente a `003_mvp_complete.sql`.
+Em uma instalação 1.0.3 existente, execute apenas `supabase/migrations/004_hardening.sql`.
 
 ## Primeiro acesso
 
 1. Crie o projeto no Supabase.
-2. Rode as 3 migrations.
+2. Rode as 4 migrations.
 3. Crie o primeiro usuário em **Authentication > Users**.
 4. Rode o bootstrap comentado no fim de `001_initial.sql` para criar organização, perfil `owner` e tarifa padrão.
 5. Configure `.env.local` a partir de `.env.example`.

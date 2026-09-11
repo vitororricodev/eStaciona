@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { getContext } from '@/lib/authz';
 import { z } from 'zod';
 
 const schema = z.object({
@@ -34,16 +34,16 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
   const input = { ...parsed.data, plate: parsed.data.plate.replace(/[^A-Z0-9]/gi, '').toUpperCase() };
-  const supabase = await createClient();
-  const { data: profile } = await supabase.from('profiles').select('organization_id').single();
+  const { supabase, user, profile } = await getContext();
   if (!profile) return NextResponse.json({ error: 'Perfil não configurado' }, { status: 403 });
-  const { data: auth } = await supabase.auth.getUser();
   const org = profile.organization_id;
 
+  let wasRecurring = true;
   let { data: vehicle } = await supabase.from('vehicles').select('*, customers(*)').eq('organization_id', org).eq('plate', input.plate).maybeSingle();
   let customer: any = vehicle ? (Array.isArray(vehicle.customers) ? vehicle.customers[0] : vehicle.customers) : null;
 
   if (!vehicle) {
+    wasRecurring = false;
     if (input.name.length < 2 || input.phone.replace(/\D/g, '').length < 8) return NextResponse.json({ error: 'Para um veículo novo, informe nome e WhatsApp do cliente.' }, { status: 400 });
     const cleanPhone = input.phone.replace(/\D/g, '');
     const existingCustomer = await supabase.from('customers').select('*').eq('organization_id', org).eq('phone', cleanPhone).maybeSingle();
@@ -80,6 +80,6 @@ export async function POST(req: NextRequest) {
 
   const { data: stay, error } = await supabase.from('stays').insert({ organization_id: org, vehicle_id: vehicle.id, tariff_plan_id: tariff.id, status: 'open' }).select('*, vehicles(*, customers(*)), tariff_plans(*)').single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  await supabase.from('audit_logs').insert({ organization_id: org, actor_user_id: auth.user?.id || null, action: 'stay.started', entity: 'stay', entity_id: stay.id, metadata: { plate: input.plate, tariffPlanId: tariff.id, tariffName: tariff.name, automaticTariff } });
-  return NextResponse.json({ stay, recurring: Boolean(customer), tariff, automaticTariff });
+  await supabase.from('audit_logs').insert({ organization_id: org, actor_user_id: user?.id || null, action: 'stay.started', entity: 'stay', entity_id: stay.id, metadata: { plate: input.plate, tariffPlanId: tariff.id, tariffName: tariff.name, automaticTariff } });
+  return NextResponse.json({ stay, recurring: wasRecurring, tariff, automaticTariff });
 }

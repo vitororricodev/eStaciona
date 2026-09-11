@@ -1,6 +1,66 @@
-import { NextRequest,NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getContext } from '@/lib/authz';
 import { stayTotals } from '@/lib/stayTotals';
 import { z } from 'zod';
-const schema=z.object({stayId:z.string().uuid(),paymentMethod:z.enum(['pix','card','cash','other'])});
-export async function POST(req:NextRequest){const p=schema.safeParse(await req.json());if(!p.success)return NextResponse.json({error:'Dados inválidos'},{status:400});const supabase=await createClient();const {data:{user}}=await supabase.auth.getUser();const {data:stay,error}=await supabase.from('stays').select('*,tariff_plans(*),stay_services(id,service_name,unit_price,quantity)').eq('id',p.data.stayId).single();if(error||!stay)return NextResponse.json({error:'Permanência não encontrada'},{status:404});if(stay.status!=='open')return NextResponse.json({error:'Permanência já finalizada'},{status:409});const totals=stayTotals(stay);const now=new Date().toISOString();const {data:cashSession}=user?await supabase.from('cash_sessions').select('id').eq('organization_id',stay.organization_id).eq('user_id',user.id).eq('status','open').maybeSingle():{data:null};if(p.data.paymentMethod==='cash'&&!cashSession)return NextResponse.json({error:'Abra o caixa antes de receber pagamento em dinheiro.'},{status:409});const upd=await supabase.from('stays').update({status:'finished',ended_at:now,final_amount:totals.amount,paid_at:now,paid_amount:totals.amount}).eq('id',stay.id).eq('status','open');if(upd.error)return NextResponse.json({error:upd.error.message},{status:500});const pay=await supabase.from('payments').insert({organization_id:stay.organization_id,stay_id:stay.id,amount:totals.amount,method:p.data.paymentMethod,status:'paid',paid_at:now,cashier_user_id:user?.id||null,cash_session_id:cashSession?.id||null,source:'counter'});if(pay.error)return NextResponse.json({error:pay.error.message},{status:500});await supabase.from('audit_logs').insert({organization_id:stay.organization_id,actor_user_id:user?.id||null,action:'stay.finished',entity:'stay',entity_id:stay.id,metadata:{amount:totals.amount,parkingAmount:totals.parkingAmount,servicesAmount:totals.servicesAmount,paymentMethod:p.data.paymentMethod,totalMinutes:totals.totalMinutes}});return NextResponse.json({ok:true,...totals});}
+
+const schema = z.object({
+  stayId: z.string().uuid(),
+  paymentMethod: z.enum(['pix', 'card', 'cash', 'other']),
+});
+
+export async function POST(req: NextRequest) {
+  const parsed = schema.safeParse(await req.json());
+  if (!parsed.success) return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
+
+  const { supabase, user, profile } = await getContext();
+  if (!user || !profile) return NextResponse.json({ error: 'Sem sessão' }, { status: 401 });
+
+  const { data: stay, error } = await supabase
+    .from('stays')
+    .select('*,tariff_plans(*),stay_services(id,service_name,unit_price,quantity)')
+    .eq('id', parsed.data.stayId)
+    .eq('organization_id', profile.organization_id)
+    .single();
+
+  if (error || !stay) return NextResponse.json({ error: 'Permanência não encontrada' }, { status: 404 });
+  if (stay.status !== 'open') return NextResponse.json({ error: 'Permanência já finalizada' }, { status: 409 });
+
+  const totals = stayTotals(stay);
+
+  const { data: cashSession } = await supabase
+    .from('cash_sessions')
+    .select('id')
+    .eq('organization_id', profile.organization_id)
+    .eq('user_id', user.id)
+    .eq('status', 'open')
+    .maybeSingle();
+
+  if (parsed.data.paymentMethod === 'cash' && !cashSession) {
+    return NextResponse.json({ error: 'Abra o caixa antes de receber pagamento em dinheiro.' }, { status: 409 });
+  }
+
+  const metadata = {
+    amount: totals.amount,
+    parkingAmount: totals.parkingAmount,
+    servicesAmount: totals.servicesAmount,
+    paymentMethod: parsed.data.paymentMethod,
+    totalMinutes: totals.totalMinutes,
+  };
+
+  const { data: result, error: finishError } = await supabase.rpc('finish_stay_atomic', {
+    p_stay_id: stay.id,
+    p_amount: totals.amount,
+    p_method: parsed.data.paymentMethod,
+    p_cash_session_id: cashSession?.id || null,
+    p_metadata: metadata,
+  });
+
+  if (finishError) {
+    const message = finishError.message || '';
+    if (message.includes('stay_not_open')) return NextResponse.json({ error: 'Permanência já finalizada' }, { status: 409 });
+    if (message.includes('cash_session_required')) return NextResponse.json({ error: 'Abra o caixa antes de receber pagamento em dinheiro.' }, { status: 409 });
+    return NextResponse.json({ error: 'Não foi possível finalizar a permanência.' }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true, result, ...totals });
+}

@@ -1,4 +1,4 @@
-# Deploy na Vercel — eStaciona 1.0.3
+# Deploy na Vercel — eStaciona 1.0.4
 
 ## Variáveis obrigatórias
 
@@ -20,6 +20,7 @@ Execute no Supabase, nesta ordem:
 1. `supabase/migrations/001_initial.sql`
 2. `supabase/migrations/002_tariffs_advanced.sql`
 3. `supabase/migrations/003_mvp_complete.sql`
+4. `supabase/migrations/004_hardening.sql`
 
 ## Build
 
@@ -32,4 +33,4 @@ Na Vercel use os padrões do Next.js:
 
 ## Observação
 
-A versão 1.0.3 corrige o erro TypeScript do deploy anterior em callbacks assíncronos passados diretamente ao `useEffect` nas telas Equipe, Caixa e Serviços.
+A versão 1.0.4 inclui correções de tipagem para Vercel, hardening de RLS, resolução correta de perfil multiusuário e finalização/pagamento atômicos.

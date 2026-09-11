@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 type CookieToSet = {
   name: string;
   value: string;
-  options: any;
+  options?: any;
 };
 
 export async function createClient() {
