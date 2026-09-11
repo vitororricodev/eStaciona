@@ -9,22 +9,32 @@ export function BrandLogo({ href = '/', compact = false }: { href?: string; comp
       aria-label="eStaciona - início"
     >
       <Image
-        src="/estaciona-icon.png"
+        src="/estaciona-icon-hq-transparent.png"
         alt=""
-        width={48}
-        height={48}
+        width={580}
+        height={440}
         priority
         className="h-11 w-11 shrink-0 object-contain"
       />
       {!compact && (
-        <Image
-          src="/estaciona-wordmark.png"
-          alt="eStaciona — O controle do seu pátio na palma da mão."
-          width={203}
-          height={59}
-          priority
-          className="h-auto w-[154px] sm:w-[175px] dark:brightness-0 dark:invert"
-        />
+        <span className="relative block h-[48px] w-[188px] sm:w-[208px]">
+          <Image
+            src="/estaciona-wordmark-light-hq.png"
+            alt="eStaciona — O controle do seu pátio na palma da mão."
+            fill
+            priority
+            sizes="208px"
+            className="object-contain object-left dark:hidden"
+          />
+          <Image
+            src="/estaciona-wordmark-dark-hq.png"
+            alt="eStaciona — O controle do seu pátio na palma da mão."
+            fill
+            priority
+            sizes="208px"
+            className="hidden object-contain object-left dark:block"
+          />
+        </span>
       )}
     </Link>
   );
