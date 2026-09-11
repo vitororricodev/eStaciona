@@ -1,3 +1,11 @@
+# 1.0.10
+
+- Redefinição administrativa de senha provisória pela tela Equipe.
+- Primeiro login obrigatório com troca de senha.
+- Compatibilidade com usuários antigos criados por convite.
+- Regras: owner → manager/operator; manager → operator.
+- Auditoria de redefinição de senha.
+
 # Changelog
 ## 1.0.9
 - Harmonização da marca com ícone maior e proporções refinadas.

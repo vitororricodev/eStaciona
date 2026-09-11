@@ -17,7 +17,7 @@ export async function GET() {
 
   return error
     ? NextResponse.json({ error: error.message }, { status: 500 })
-    : NextResponse.json({ staff: data || [] });
+    : NextResponse.json({ staff: data || [], viewerRole: profile.role });
 }
 
 const schema = z.object({
