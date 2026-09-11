@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.3
+- Corrige callbacks assíncronos usados diretamente em `useEffect`, que bloqueavam o build da Vercel.
+- Atualiza versão para 1.0.3.
+
 ## 1.0.1 — Identidade visual
 
 - Aplicada a logo oficial do eStaciona nas áreas que usam `BrandLogo`.
