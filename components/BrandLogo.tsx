@@ -23,7 +23,7 @@ export function BrandLogo({ href = '/', compact = false }: { href?: string; comp
           width={203}
           height={59}
           priority
-          className="h-auto w-[154px] sm:w-[175px]"
+          className="h-auto w-[154px] sm:w-[175px] dark:brightness-0 dark:invert"
         />
       )}
     </Link>
