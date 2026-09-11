@@ -17,12 +17,21 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#1677F8',
-  colorScheme: 'light',
+  colorScheme: 'light dark',
 };
+
+const themeScript = `
+  try {
+    const saved = localStorage.getItem('estaciona-theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) document.documentElement.classList.add('dark');
+  } catch {}
+`;
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
       <body><PwaRegister />{children}</body>
     </html>
   );

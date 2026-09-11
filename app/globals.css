@@ -4,6 +4,26 @@
 
 :root { color-scheme: light; }
 html { background: #f8fbff; }
-body { @apply bg-slate-50 text-slate-950 antialiased; }
+html.dark { color-scheme: dark; background: #020617; }
+body { @apply bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text-slate-100; }
 * { box-sizing: border-box; }
 ::selection { background: #bce8ff; color: #184b7d; }
+
+/* Camada de compatibilidade para as telas existentes, sem refatorar os componentes já estáveis. */
+.dark .bg-white { background-color: #0f172a !important; }
+.dark .bg-slate-50 { background-color: #020617 !important; }
+.dark .bg-slate-100 { background-color: #1e293b !important; }
+.dark .bg-brand-50 { background-color: rgba(20, 83, 167, .18) !important; }
+.dark .border-slate-200 { border-color: #334155 !important; }
+.dark .border-brand-100 { border-color: rgba(32, 160, 252, .24) !important; }
+.dark .text-slate-950 { color: #f8fafc !important; }
+.dark .text-slate-900 { color: #f1f5f9 !important; }
+.dark .text-slate-700 { color: #cbd5e1 !important; }
+.dark .text-slate-600 { color: #cbd5e1 !important; }
+.dark .text-slate-500 { color: #94a3b8 !important; }
+.dark .text-slate-400 { color: #94a3b8 !important; }
+.dark input,
+.dark select,
+.dark textarea { background-color: #0f172a; color: #f8fafc; border-color: #334155; }
+.dark input::placeholder,
+.dark textarea::placeholder { color: #64748b; }

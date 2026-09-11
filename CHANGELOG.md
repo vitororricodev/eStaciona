@@ -30,3 +30,16 @@
 
 ## 0.3.0
 - Núcleo operacional: entrada, QR, cobrança e saída.
+
+## 1.0.5
+- Cadastro manual de equipe com e-mail e senha, sem convite.
+- Administração SaaS para criação de novos estacionamentos.
+- Senha provisória obrigatoriamente alterada no primeiro acesso.
+- Controle de acesso da administração SaaS por `PLATFORM_ADMIN_USER_ID`.
+- Modo escuro com preferência persistida.
+- Migration `005_admin_onboarding.sql`.
+
+## 1.0.6
+- Suporte a múltiplos Admins Master da Plataforma via `PLATFORM_ADMIN_USER_IDS`.
+- Cadastro de estacionamentos visível e acessível somente para Admin Master.
+- Identificação visual de Admin Master separada dos perfis owner/manager/operator.

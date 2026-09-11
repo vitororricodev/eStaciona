@@ -16,7 +16,7 @@ export async function GET() {
     const supabase = createAdminClient();
     const { error } = await supabase.from('organizations').select('id').limit(1);
     if (error) return NextResponse.json({ ok: false, error: 'Banco indisponível' }, { status: 503 });
-    return NextResponse.json({ ok: true, service: 'eStaciona', version: '1.0.4' });
+    return NextResponse.json({ ok: true, service: 'eStaciona', version: '1.0.5' });
   } catch {
     return NextResponse.json({ ok: false, error: 'Falha ao conectar ao banco' }, { status: 503 });
   }

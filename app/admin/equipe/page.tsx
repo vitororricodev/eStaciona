@@ -7,6 +7,7 @@ import { AdminNav } from '@/components/AdminNav';
 export default function Page() {
   const [rows, setRows] = useState<any[]>([]);
   const [msg, setMsg] = useState('');
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
     const response = await fetch('/api/staff');
@@ -18,9 +19,10 @@ export default function Page() {
     void load();
   }, [load]);
 
-  async function invite(e: FormEvent<HTMLFormElement>) {
+  async function createStaff(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setMsg('');
+    setSaving(true);
     const form = new FormData(e.currentTarget);
     const response = await fetch('/api/staff', {
       method: 'POST',
@@ -28,11 +30,13 @@ export default function Page() {
       body: JSON.stringify({
         name: form.get('name'),
         email: form.get('email'),
+        password: form.get('password'),
         role: form.get('role'),
       }),
     });
     const data = await response.json();
-    setMsg(response.ok ? 'Convite enviado.' : data.error || 'Erro');
+    setSaving(false);
+    setMsg(response.ok ? 'Usuário cadastrado com sucesso.' : data.error || 'Erro ao cadastrar usuário.');
     if (response.ok) {
       e.currentTarget.reset();
       void load();
@@ -54,16 +58,19 @@ export default function Page() {
     <AppShell title="Gestão">
       <AdminNav />
       <h1 className="text-3xl font-black">Equipe</h1>
-      <p className="mt-2 text-slate-500">Convites e permissões por perfil.</p>
-      <form onSubmit={invite} className="mt-6 grid gap-3 rounded-3xl bg-white p-5 shadow-sm md:grid-cols-4">
+      <p className="mt-2 text-slate-500">Cadastre usuários manualmente e defina as permissões por perfil.</p>
+      <form onSubmit={createStaff} className="mt-6 grid gap-3 rounded-3xl bg-white p-5 shadow-sm md:grid-cols-2 lg:grid-cols-5">
         <input name="name" required placeholder="Nome" className="rounded-2xl border border-slate-200 px-4 py-3" />
         <input name="email" required type="email" placeholder="E-mail" className="rounded-2xl border border-slate-200 px-4 py-3" />
+        <input name="password" required type="password" minLength={8} placeholder="Senha" className="rounded-2xl border border-slate-200 px-4 py-3" />
         <select name="role" className="rounded-2xl border border-slate-200 px-4 py-3">
           <option value="operator">Operador</option>
           <option value="manager">Gerente</option>
         </select>
-        <button className="rounded-2xl bg-brand-600 px-4 font-bold text-white">Convidar</button>
-        {msg && <p className="text-sm md:col-span-4">{msg}</p>}
+        <button disabled={saving} className="rounded-2xl bg-brand-600 px-4 py-3 font-bold text-white disabled:opacity-60">
+          {saving ? 'Cadastrando...' : 'Cadastrar'}
+        </button>
+        {msg && <p className="text-sm md:col-span-2 lg:col-span-5">{msg}</p>}
       </form>
       <div className="mt-6 space-y-3">
         {rows.map((item) => (

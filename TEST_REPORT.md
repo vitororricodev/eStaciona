@@ -1,51 +1,24 @@
-# eStaciona 1.0.4 — Relatório de revisão
+# TEST REPORT — eStaciona 1.0.5
 
-Revisões executadas nesta versão:
+## Revisão executada
+- 66 arquivos TypeScript/TSX analisados pelo parser do TypeScript.
+- 0 erros de sintaxe TS/TSX.
+- Imports internos `@/` validados contra o sistema de arquivos.
+- 0 imports internos ausentes.
+- Varredura dos padrões de regressão que já quebraram a Vercel (`useEffect` async direto e `cookiesToSet` sem tipo explícito): 0 ocorrências problemáticas.
+- Verificação de arquivos obrigatórios do novo fluxo de administração SaaS: OK.
+- Verificação de versionamento `package.json` e `/api/health`: 1.0.5.
+- `.env.example` revisado sem chave secreta ou UUID administrativo preenchido.
 
-- sintaxe de todos os arquivos `.ts` e `.tsx` validada com o parser do TypeScript;
-- imports internos `@/` e relativos verificados: nenhum caminho ausente;
-- referências `fetch('/api/...')` comparadas às rotas existentes: nenhuma rota ausente;
-- callbacks `setAll(cookiesToSet)` do Supabase tipados explicitamente;
-- busca por `useEffect(load, ...)`/callback Promise direto: nenhuma ocorrência restante;
-- resolução de perfil corrigida para organizações com múltiplos funcionários;
-- motor tarifário compilado isoladamente e testado para tolerância, primeira faixa, frações, teto de 24h e múltiplos dias;
-- auditoria RLS corrigida na migration `004_hardening.sql`;
-- finalização da permanência + pagamento tornados atômicos via `finish_stay_atomic`;
-- consulta pública endurecida para exigir WhatsApp cadastrado completo;
-- varredura de segredos: nenhuma credencial real encontrada no pacote;
-- endpoint `/api/health` adicionado para checar configuração e banco em deploy.
+## Fluxos revisados por código
+- Login normal preservado.
+- Primeiro login com senha provisória redireciona para `/alterar-senha`.
+- Middleware impede acesso a `/admin` e `/operacao` enquanto `must_change_password=true`.
+- Troca de senha atualiza Supabase Auth e libera o perfil.
+- Cadastro manual de funcionário usa `admin.auth.admin.createUser` e cria profile na mesma organização.
+- Cadastro de estacionamento protegido por `PLATFORM_ADMIN_USER_IDS`.
+- Cadastro de estacionamento cria organização, owner e tarifa padrão, com rollback em falha intermediária.
+- Modo escuro persiste via `localStorage` e não altera os fluxos de negócio.
 
-## Teste de motor tarifário
-
-Casos aprovados:
-
-- 5 min dentro da tolerância: R$ 0;
-- 10 min no limite: R$ 0;
-- 11 min: primeira faixa;
-- 60 min: primeira faixa;
-- 61 min: primeira fração adicional;
-- 90 min: uma fração adicional;
-- 91 min: duas frações adicionais;
-- 24h: teto diário;
-- 24h + 1 min: novo ciclo de cobrança;
-- formatação de duração acima de 24h.
-
-## Validação final no ambiente de deploy
-
-Após instalar as dependências, rode:
-
-```bash
-npm run verify
-```
-
-Depois do deploy, acesse:
-
-```text
-/api/health
-```
-
-O retorno esperado é:
-
-```json
-{"ok":true,"service":"eStaciona","version":"1.0.4"}
-```
+## Observação de ambiente
+O pacote foi validado estruturalmente e por parser TypeScript. O ambiente desta sessão não possui as dependências npm locais nem acesso à internet para executar um `next build` completo. O build final continua sendo validado pela Vercel após o push, como no deploy anterior já operacional.
