@@ -44,7 +44,7 @@ export function BrandLogo({ href = '/', compact = false, size = 'md' }: BrandLog
       </span>
 
       {!compact && (
-        <span className={`relative block ${current.wrap}`}>
+        <span className={`relative hidden sm:block ${current.wrap}`}>
           <Image
             src="/estaciona-wordmark-light-hq.png"
             alt="eStaciona — O controle do seu pátio na palma da mão."

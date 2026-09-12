@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContext } from '@/lib/authz';
 import { z } from 'zod';
+import { isValidBrazilianPlate, normalizePlate } from '@/lib/plate';
 
 const schema = z.object({
   plate: z.string().min(6).max(8),
@@ -8,6 +9,8 @@ const schema = z.object({
   phone: z.string().trim().optional().default(''),
   make: z.string().trim().optional(), model: z.string().trim().optional(), color: z.string().trim().optional(),
   tariffPlanId: z.string().uuid().optional().nullable(),
+  hasParkingTag: z.boolean().optional().default(false),
+  isMonthly: z.boolean().optional().default(false),
 });
 
 function localParts(timeZone: string) {
@@ -33,7 +36,10 @@ function applicable(t: any, parts: ReturnType<typeof localParts>) {
 export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
-  const input = { ...parsed.data, plate: parsed.data.plate.replace(/[^A-Z0-9]/gi, '').toUpperCase() };
+  const input = { ...parsed.data, plate: normalizePlate(parsed.data.plate) };
+  if (!isValidBrazilianPlate(input.plate)) {
+    return NextResponse.json({ error: 'Placa inválida. Use o padrão ABC1234 ou ABC1D23.' }, { status: 400 });
+  }
   const { supabase, user, profile } = await getContext();
   if (!profile) return NextResponse.json({ error: 'Perfil não configurado' }, { status: 403 });
   const org = profile.organization_id;
@@ -78,8 +84,8 @@ export async function POST(req: NextRequest) {
   }
   if (!tariff) return NextResponse.json({ error: 'Cadastre uma tarifa ativa antes de iniciar.' }, { status: 400 });
 
-  const { data: stay, error } = await supabase.from('stays').insert({ organization_id: org, vehicle_id: vehicle.id, tariff_plan_id: tariff.id, status: 'open' }).select('*, vehicles(*, customers(*)), tariff_plans(*)').single();
+  const { data: stay, error } = await supabase.from('stays').insert({ organization_id: org, vehicle_id: vehicle.id, tariff_plan_id: tariff.id, status: 'open', has_parking_tag: input.hasParkingTag, is_monthly: input.isMonthly }).select('*, vehicles(*, customers(*)), tariff_plans(*)').single();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  await supabase.from('audit_logs').insert({ organization_id: org, actor_user_id: user?.id || null, action: 'stay.started', entity: 'stay', entity_id: stay.id, metadata: { plate: input.plate, tariffPlanId: tariff.id, tariffName: tariff.name, automaticTariff } });
+  await supabase.from('audit_logs').insert({ organization_id: org, actor_user_id: user?.id || null, action: 'stay.started', entity: 'stay', entity_id: stay.id, metadata: { plate: input.plate, tariffPlanId: tariff.id, tariffName: tariff.name, automaticTariff, hasParkingTag: input.hasParkingTag, isMonthly: input.isMonthly } });
   return NextResponse.json({ stay, recurring: wasRecurring, tariff, automaticTariff });
 }

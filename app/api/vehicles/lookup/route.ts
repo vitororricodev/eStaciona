@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getContext } from '@/lib/authz';
+import { isValidBrazilianPlate, normalizePlate } from '@/lib/plate';
 
 export async function GET(req: NextRequest) {
-  const plate = (req.nextUrl.searchParams.get('plate') || '').replace(/[^A-Z0-9]/gi, '').toUpperCase();
-  if (plate.length < 6) return NextResponse.json({ found: false });
+  const plate = normalizePlate(req.nextUrl.searchParams.get('plate') || '');
+  if (!isValidBrazilianPlate(plate)) {
+    return NextResponse.json({ error: 'Placa inválida. Use o padrão ABC1234 ou ABC1D23.' }, { status: 400 });
+  }
 
   const { supabase, profile } = await getContext();
   if (!profile) return NextResponse.json({ error: 'Perfil não configurado' }, { status: 403 });

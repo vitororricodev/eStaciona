@@ -6,9 +6,9 @@ export function AppShell({ title, children, action }: { title: string; children:
   return (
     <main className="min-h-screen bg-slate-50 dark:bg-slate-950 dark:text-slate-100">
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
-          <BrandLogo size="md" />
-          <div className="flex items-center gap-2 sm:gap-3">
+        <div className="mx-auto flex max-w-6xl min-w-0 items-center justify-between gap-2 px-3 py-3 sm:px-6">
+          <div className="min-w-0 flex-1 sm:flex-none"><BrandLogo size="md" /></div>
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
             <span className="hidden rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700 dark:bg-slate-900 dark:text-brand-300 sm:block">{title}</span>
             <ThemeToggle />
             {action}
@@ -16,7 +16,7 @@ export function AppShell({ title, children, action }: { title: string; children:
           </div>
         </div>
       </header>
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{children}</div>
+      <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-3 py-5 sm:px-6 sm:py-6">{children}</div>
     </main>
   );
 }

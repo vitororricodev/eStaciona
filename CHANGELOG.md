@@ -1,3 +1,10 @@
+# 1.0.11
+
+- Validação de placa brasileira no frontend/backend.
+- Flags TAG e Mensalista na entrada.
+- Envio manual do ticket via wa.me com mensagem pronta.
+- Hardening de responsividade mobile.
+
 # 1.0.10
 
 - Redefinição administrativa de senha provisória pela tela Equipe.

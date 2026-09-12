@@ -8,7 +8,7 @@ export async function GET() {
 
   const { data, error } = await supabase
     .from('stays')
-    .select('id,public_token,started_at,status,paid_at,paid_amount,payment_grace_until,vehicles(id,plate,make,model,color,customers(id,name,phone)),tariff_plans(*),stay_services(id,service_name,unit_price,quantity)')
+    .select('id,public_token,started_at,status,paid_at,paid_amount,payment_grace_until,has_parking_tag,is_monthly,vehicles(id,plate,make,model,color,customers(id,name,phone)),tariff_plans(*),stay_services(id,service_name,unit_price,quantity)')
     .eq('organization_id', profile.organization_id)
     .eq('status', 'open')
     .order('started_at', { ascending: true })

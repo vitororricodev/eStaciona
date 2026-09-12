@@ -229,3 +229,9 @@ body { @apply bg-slate-50 text-slate-950 antialiased dark:bg-slate-950 dark:text
 
   .splash-loader { width: 100%; }
 }
+
+/* Mobile hardening */
+html, body { max-width: 100%; overflow-x: hidden; }
+img, svg, video, canvas { max-width: 100%; }
+button, a, input, select, textarea { min-width: 0; }
+.break-mobile { overflow-wrap: anywhere; word-break: break-word; }
