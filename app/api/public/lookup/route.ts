@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { enforceRateLimit } from '@/lib/rateLimit';
+import { isValidBrazilianPlate, normalizePlate } from '@/lib/plate';
 
 function digits(value: unknown) {
   return String(value || '').replace(/\D/g, '');
@@ -14,11 +16,18 @@ function samePhone(stored: string, informed: string) {
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
-  const plate = String(body.plate || '').replace(/[^A-Z0-9]/gi, '').toUpperCase();
+  const plate = normalizePlate(String(body.plate || ''));
   const phone = digits(body.phone);
 
-  if (plate.length < 6 || phone.length < 8) {
+  if (!isValidBrazilianPlate(plate) || phone.length < 8) {
     return NextResponse.json({ error: 'Informe a placa e o WhatsApp cadastrado.' }, { status: 400 });
+  }
+
+  try {
+    const limited = await enforceRateLimit(req, { route: 'public_lookup', limit: 10, windowSeconds: 300 }, `${plate}|${phone}`);
+    if (limited) return limited;
+  } catch {
+    return NextResponse.json({ error: 'Consulta temporariamente indisponível.' }, { status: 503 });
   }
 
   const supabase = createAdminClient();

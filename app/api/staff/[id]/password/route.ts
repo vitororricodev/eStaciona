@@ -7,10 +7,7 @@ const schema = z.object({
   password: z.string().min(8).max(72),
 });
 
-export async function POST(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const parsed = schema.safeParse(await req.json());
 
@@ -39,13 +36,13 @@ export async function POST(
 
   const { data: target, error: targetError } = await supabase
     .from('profiles')
-    .select('id,name,role,organization_id')
+    .select('id,name,role,organization_id,must_change_password')
     .eq('id', id)
     .eq('organization_id', profile.organization_id)
     .maybeSingle();
 
   if (targetError) {
-    return NextResponse.json({ error: targetError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Não foi possível consultar o usuário.' }, { status: 500 });
   }
 
   if (!target) {
@@ -68,18 +65,6 @@ export async function POST(
 
   const admin = createAdminClient();
 
-  const { error: authError } = await admin.auth.admin.updateUserById(id, {
-    password: parsed.data.password,
-    email_confirm: true,
-  });
-
-  if (authError) {
-    return NextResponse.json(
-      { error: authError.message || 'Não foi possível redefinir a senha.' },
-      { status: 500 },
-    );
-  }
-
   const { error: profileError } = await admin
     .from('profiles')
     .update({ must_change_password: true })
@@ -87,7 +72,21 @@ export async function POST(
     .eq('organization_id', profile.organization_id);
 
   if (profileError) {
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Não foi possível preparar o primeiro acesso.' }, { status: 500 });
+  }
+
+  const { error: authError } = await admin.auth.admin.updateUserById(id, {
+    password: parsed.data.password,
+    email_confirm: true,
+  });
+
+  if (authError) {
+    await admin
+      .from('profiles')
+      .update({ must_change_password: target.must_change_password })
+      .eq('id', id)
+      .eq('organization_id', profile.organization_id);
+    return NextResponse.json({ error: 'Não foi possível redefinir a senha.' }, { status: 500 });
   }
 
   await admin.from('audit_logs').insert({

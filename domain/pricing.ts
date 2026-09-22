@@ -1,4 +1,8 @@
 export type Tariff = {
+  id?: string;
+  name?: string;
+  category?: string;
+  description?: string | null;
   tolerance_minutes: number;
   first_period_minutes?: number | null;
   first_hour_price: number;
@@ -7,6 +11,48 @@ export type Tariff = {
   additional_fraction_price?: number | null;
   daily_max: number | null;
 };
+
+export type TariffSnapshot = Required<
+  Pick<
+    Tariff,
+    | 'id'
+    | 'name'
+    | 'category'
+    | 'tolerance_minutes'
+    | 'first_period_minutes'
+    | 'first_hour_price'
+    | 'additional_hour_price'
+    | 'fraction_minutes'
+    | 'additional_fraction_price'
+    | 'daily_max'
+  >
+> & {
+  description: string | null;
+  captured_at: string;
+  pricing_version: 1;
+};
+
+export function createTariffSnapshot(tariff: Tariff, capturedAt = new Date().toISOString()): TariffSnapshot {
+  if (!tariff.id || !tariff.name || !tariff.category) throw new Error('invalid_tariff_snapshot');
+  return {
+    id: tariff.id,
+    name: tariff.name,
+    category: tariff.category,
+    description: tariff.description ?? null,
+    tolerance_minutes: Number(tariff.tolerance_minutes),
+    first_period_minutes: Number(tariff.first_period_minutes || 60),
+    first_hour_price: Number(tariff.first_hour_price),
+    additional_hour_price: Number(tariff.additional_hour_price),
+    fraction_minutes: Number(tariff.fraction_minutes),
+    additional_fraction_price:
+      tariff.additional_fraction_price == null
+        ? Number(tariff.additional_hour_price) * (Number(tariff.fraction_minutes) / 60)
+        : Number(tariff.additional_fraction_price),
+    daily_max: tariff.daily_max == null ? null : Number(tariff.daily_max),
+    captured_at: capturedAt,
+    pricing_version: 1,
+  };
+}
 
 export type PricingBreakdown = {
   totalMinutes: number;
@@ -24,9 +70,10 @@ function calculateCycle(minutes: number, tariff: Tariff) {
   if (minutes <= 0) return 0;
   const firstPeriod = Math.max(1, Number(tariff.first_period_minutes || 60));
   const fraction = Math.max(1, Number(tariff.fraction_minutes || 60));
-  const fractionPrice = tariff.additional_fraction_price != null
-    ? Number(tariff.additional_fraction_price)
-    : Number(tariff.additional_hour_price || 0) * (fraction / 60);
+  const fractionPrice =
+    tariff.additional_fraction_price != null
+      ? Number(tariff.additional_fraction_price)
+      : Number(tariff.additional_hour_price || 0) * (fraction / 60);
 
   let amount = Number(tariff.first_hour_price || 0);
   const extra = Math.max(0, minutes - firstPeriod);
@@ -47,7 +94,13 @@ export function calculatePrice(startedAt: string | Date, tariff: Tariff, now = n
   const totalMinutes = Math.max(0, Math.ceil((now.getTime() - start.getTime()) / 60000));
   const tolerance = Math.max(0, Number(tariff.tolerance_minutes || 0));
   if (totalMinutes <= tolerance) {
-    return { totalMinutes, billableMinutes: 0, amount: 0, days: 0, description: `Dentro da tolerância de ${tolerance} min` };
+    return {
+      totalMinutes,
+      billableMinutes: 0,
+      amount: 0,
+      days: 0,
+      description: `Dentro da tolerância de ${tolerance} min`,
+    };
   }
 
   const billableMinutes = totalMinutes;
@@ -66,7 +119,8 @@ export function calculatePrice(startedAt: string | Date, tariff: Tariff, now = n
     billableMinutes,
     amount: roundMoney(amount),
     days,
-    description: tariff.daily_max != null && days > 1 ? `${days} ciclos de até 24h` : 'Tarifa calculada automaticamente',
+    description:
+      tariff.daily_max != null && days > 1 ? `${days} ciclos de até 24h` : 'Tarifa calculada automaticamente',
   };
 }
 
@@ -81,14 +135,18 @@ export function formatDuration(minutes: number) {
 export function tariffSummary(tariff: Tariff) {
   const firstPeriod = Number(tariff.first_period_minutes || 60);
   const fraction = Number(tariff.fraction_minutes || 60);
-  const fractionPrice = tariff.additional_fraction_price != null
-    ? Number(tariff.additional_fraction_price)
-    : Number(tariff.additional_hour_price || 0) * (fraction / 60);
+  const fractionPrice =
+    tariff.additional_fraction_price != null
+      ? Number(tariff.additional_fraction_price)
+      : Number(tariff.additional_hour_price || 0) * (fraction / 60);
   const parts = [
-    `${firstPeriod} min: R$ ${Number(tariff.first_hour_price || 0).toFixed(2).replace('.', ',')}`,
+    `${firstPeriod} min: R$ ${Number(tariff.first_hour_price || 0)
+      .toFixed(2)
+      .replace('.', ',')}`,
     `+ ${fraction} min: R$ ${fractionPrice.toFixed(2).replace('.', ',')}`,
   ];
   if (tariff.tolerance_minutes > 0) parts.unshift(`Tolerância ${tariff.tolerance_minutes} min`);
-  if (tariff.daily_max != null) parts.push(`Teto 24h: R$ ${Number(tariff.daily_max).toFixed(2).replace('.', ',')}`);
+  if (tariff.daily_max != null)
+    parts.push(`Teto 24h: R$ ${Number(tariff.daily_max).toFixed(2).replace('.', ',')}`);
   return parts.join(' • ');
 }

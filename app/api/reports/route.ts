@@ -1,3 +1,65 @@
-import { NextRequest,NextResponse } from 'next/server';
-import { getContext,canManage } from '@/lib/authz';
-export async function GET(req:NextRequest){const {supabase,profile}=await getContext();if(!profile||!canManage(profile.role))return NextResponse.json({error:'Sem permissão'},{status:403});const days=Math.min(365,Math.max(1,Number(req.nextUrl.searchParams.get('days')||30)));const from=new Date(Date.now()-days*86400000);const [stays,payments]=await Promise.all([supabase.from('stays').select('id,started_at,ended_at,status,final_amount,vehicles(plate,make,model,customers(name)),tariff_plans(name)').eq('organization_id',profile.organization_id).gte('started_at',from.toISOString()).order('started_at',{ascending:false}).limit(2000),supabase.from('payments').select('id,stay_id,amount,method,status,paid_at,source').eq('organization_id',profile.organization_id).eq('status','paid').gte('paid_at',from.toISOString()).order('paid_at',{ascending:false}).limit(5000)]);if(stays.error||payments.error)return NextResponse.json({error:stays.error?.message||payments.error?.message},{status:500});const rows=stays.data||[],pays=payments.data||[];const revenue=pays.reduce((s:any,p:any)=>s+Number(p.amount),0);const finished=rows.filter((s:any)=>s.status==='finished');const durations=finished.filter((s:any)=>s.ended_at).map((s:any)=>Math.max(0,(new Date(s.ended_at).getTime()-new Date(s.started_at).getTime())/60000));const byMethod=Object.fromEntries(['pix','card','cash','other'].map(m=>[m,pays.filter((p:any)=>p.method===m).reduce((s:any,p:any)=>s+Number(p.amount),0)]));const byDay:Record<string,number>={};pays.forEach((p:any)=>{const k=String(p.paid_at).slice(0,10);byDay[k]=(byDay[k]||0)+Number(p.amount)});return NextResponse.json({periodDays:days,summary:{revenue,entries:rows.length,finished:finished.length,open:rows.filter((x:any)=>x.status==='open').length,cancelled:rows.filter((x:any)=>x.status==='cancelled').length,ticketAverage:finished.length?revenue/finished.length:0,averageMinutes:durations.length?durations.reduce((a,b)=>a+b,0)/durations.length:0},byMethod,byDay:Object.entries(byDay).sort(),movements:rows.slice(0,300)});}
+import { NextRequest, NextResponse } from 'next/server';
+import { getContext, canManage } from '@/lib/authz';
+export async function GET(req: NextRequest) {
+  const { supabase, profile } = await getContext();
+  if (!profile || !canManage(profile.role))
+    return NextResponse.json({ error: 'Sem permissão' }, { status: 403 });
+  const days = Math.min(365, Math.max(1, Number(req.nextUrl.searchParams.get('days') || 30)));
+  const from = new Date(Date.now() - days * 86400000);
+  const [stays, payments] = await Promise.all([
+    supabase
+      .from('stays')
+      .select(
+        'id,started_at,ended_at,status,final_amount,vehicles(plate,make,model,customers(name)),tariff_plans(name)',
+      )
+      .eq('organization_id', profile.organization_id)
+      .gte('started_at', from.toISOString())
+      .order('started_at', { ascending: false })
+      .limit(2000),
+    supabase
+      .from('payments')
+      .select('id,stay_id,amount,method,status,paid_at,source')
+      .eq('organization_id', profile.organization_id)
+      .eq('status', 'paid')
+      .gte('paid_at', from.toISOString())
+      .order('paid_at', { ascending: false })
+      .limit(5000),
+  ]);
+  if (stays.error || payments.error)
+    return NextResponse.json({ error: 'Não foi possível gerar o relatório.' }, { status: 500 });
+  const rows = stays.data || [],
+    pays = payments.data || [];
+  const revenue = pays.reduce((s: any, p: any) => s + Number(p.amount), 0);
+  const finished = rows.filter((s: any) => s.status === 'finished');
+  const durations = finished
+    .filter((s: any) => s.ended_at)
+    .map((s: any) =>
+      Math.max(0, (new Date(s.ended_at).getTime() - new Date(s.started_at).getTime()) / 60000),
+    );
+  const byMethod = Object.fromEntries(
+    ['pix', 'card', 'cash', 'other'].map((m) => [
+      m,
+      pays.filter((p: any) => p.method === m).reduce((s: any, p: any) => s + Number(p.amount), 0),
+    ]),
+  );
+  const byDay: Record<string, number> = {};
+  pays.forEach((p: any) => {
+    const k = String(p.paid_at).slice(0, 10);
+    byDay[k] = (byDay[k] || 0) + Number(p.amount);
+  });
+  return NextResponse.json({
+    periodDays: days,
+    summary: {
+      revenue,
+      entries: rows.length,
+      finished: finished.length,
+      open: rows.filter((x: any) => x.status === 'open').length,
+      cancelled: rows.filter((x: any) => x.status === 'cancelled').length,
+      ticketAverage: finished.length ? revenue / finished.length : 0,
+      averageMinutes: durations.length ? durations.reduce((a, b) => a + b, 0) / durations.length : 0,
+    },
+    byMethod,
+    byDay: Object.entries(byDay).sort(),
+    movements: rows.slice(0, 300),
+  });
+}

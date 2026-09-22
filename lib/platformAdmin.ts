@@ -1,6 +1,5 @@
 function configuredPlatformAdminIds() {
-  const multiple = process.env.PLATFORM_ADMIN_USER_IDS
-    ?.split(',')
+  const multiple = process.env.PLATFORM_ADMIN_USER_IDS?.split(',')
     .map((value) => value.trim())
     .filter(Boolean);
 

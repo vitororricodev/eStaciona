@@ -18,10 +18,15 @@ export async function GET(req: NextRequest) {
     .eq('plate', plate)
     .maybeSingle();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Não foi possível consultar o veículo.' }, { status: 500 });
   if (!data) return NextResponse.json({ found: false });
 
   const stays = Array.isArray(data.stays) ? data.stays : [];
   const openStay = stays.find((stay: any) => stay.status === 'open');
-  return NextResponse.json({ found: true, vehicle: data, hasOpenStay: Boolean(openStay), openStay: openStay || null });
+  return NextResponse.json({
+    found: true,
+    vehicle: data,
+    hasOpenStay: Boolean(openStay),
+    openStay: openStay || null,
+  });
 }

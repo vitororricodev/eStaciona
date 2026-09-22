@@ -125,14 +125,35 @@ export default function Page() {
         onSubmit={createStaff}
         className="mt-6 grid gap-3 rounded-3xl bg-white p-5 shadow-sm md:grid-cols-2 lg:grid-cols-5"
       >
-        <input name="name" required placeholder="Nome" className="rounded-2xl border border-slate-200 px-4 py-3" />
-        <input name="email" required type="email" placeholder="E-mail" className="rounded-2xl border border-slate-200 px-4 py-3" />
-        <input name="password" required type="password" minLength={8} placeholder="Senha" className="rounded-2xl border border-slate-200 px-4 py-3" />
+        <input
+          name="name"
+          required
+          placeholder="Nome"
+          className="rounded-2xl border border-slate-200 px-4 py-3"
+        />
+        <input
+          name="email"
+          required
+          type="email"
+          placeholder="E-mail"
+          className="rounded-2xl border border-slate-200 px-4 py-3"
+        />
+        <input
+          name="password"
+          required
+          type="password"
+          minLength={8}
+          placeholder="Senha"
+          className="rounded-2xl border border-slate-200 px-4 py-3"
+        />
         <select name="role" className="rounded-2xl border border-slate-200 px-4 py-3">
           <option value="operator">Operador</option>
           <option value="manager">Gerente</option>
         </select>
-        <button disabled={saving} className="rounded-2xl bg-brand-600 px-4 py-3 font-bold text-white disabled:opacity-60">
+        <button
+          disabled={saving}
+          className="rounded-2xl bg-brand-600 px-4 py-3 font-bold text-white disabled:opacity-60"
+        >
           {saving ? 'Cadastrando...' : 'Cadastrar'}
         </button>
       </form>
@@ -149,7 +170,9 @@ export default function Page() {
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="font-black">{item.name}</h2>
-                <p className="text-sm text-slate-500">{item.role} • {item.active ? 'ativo' : 'inativo'}</p>
+                <p className="text-sm text-slate-500">
+                  {item.role} • {item.active ? 'ativo' : 'inativo'}
+                </p>
               </div>
 
               {item.role !== 'owner' && (
@@ -226,7 +249,8 @@ export default function Page() {
                 </button>
 
                 <p className="text-xs text-slate-500 md:col-span-3">
-                  O usuário entrará com essa senha provisória e será obrigado a criar uma nova senha antes de acessar o sistema.
+                  O usuário entrará com essa senha provisória e será obrigado a criar uma nova senha antes de
+                  acessar o sistema.
                 </p>
               </form>
             )}

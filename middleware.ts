@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { isPlatformAdmin } from '@/lib/platformAdmin';
 
 type CookieToSet = {
   name: string;
@@ -27,9 +28,12 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
-  const protectedPath = pathname.startsWith('/operacao') || pathname.startsWith('/admin') || pathname === '/alterar-senha';
+  const protectedPath =
+    pathname.startsWith('/operacao') || pathname.startsWith('/admin') || pathname === '/alterar-senha';
 
   if (protectedPath && !user) {
     const url = request.nextUrl.clone();
@@ -40,7 +44,7 @@ export async function middleware(request: NextRequest) {
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('must_change_password')
+      .select('role,active,must_change_password')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -48,6 +52,32 @@ export async function middleware(request: NextRequest) {
       const url = request.nextUrl.clone();
       url.pathname = '/alterar-senha';
       return NextResponse.redirect(url);
+    }
+
+    if (protectedPath && (!profile || !profile.active)) {
+      if (pathname === '/admin/estacionamentos' && isPlatformAdmin(user.id)) return response;
+      const url = request.nextUrl.clone();
+      url.pathname = '/login';
+      return NextResponse.redirect(url);
+    }
+
+    if (pathname.startsWith('/admin')) {
+      const platformOnly = pathname.startsWith('/admin/estacionamentos');
+      if (platformOnly && !isPlatformAdmin(user.id)) {
+        const url = request.nextUrl.clone();
+        url.pathname = profile?.role === 'operator' ? '/operacao' : '/admin';
+        return NextResponse.redirect(url);
+      }
+      if (!platformOnly && profile?.role === 'operator') {
+        const url = request.nextUrl.clone();
+        url.pathname = '/operacao';
+        return NextResponse.redirect(url);
+      }
+      if (!platformOnly && !profile && isPlatformAdmin(user.id)) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/admin/estacionamentos';
+        return NextResponse.redirect(url);
+      }
     }
   }
 

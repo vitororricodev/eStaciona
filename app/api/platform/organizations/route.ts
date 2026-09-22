@@ -13,13 +13,15 @@ const schema = z.object({
 });
 
 function slugify(value: string) {
-  return value
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 45) || 'estacionamento';
+  return (
+    value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '')
+      .slice(0, 45) || 'estacionamento'
+  );
 }
 
 async function requirePlatformAdmin() {
@@ -38,14 +40,16 @@ export async function GET() {
     .select('id,name,slug,created_at')
     .order('created_at', { ascending: false });
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error)
+    return NextResponse.json({ error: 'Não foi possível carregar os estacionamentos.' }, { status: 500 });
 
   const { data: owners, error: ownersError } = await admin
     .from('profiles')
     .select('organization_id,name,role,active')
     .eq('role', 'owner');
 
-  if (ownersError) return NextResponse.json({ error: ownersError.message }, { status: 500 });
+  if (ownersError)
+    return NextResponse.json({ error: 'Não foi possível carregar os proprietários.' }, { status: 500 });
 
   const rows = (organizations || []).map((organization) => ({
     ...organization,
@@ -57,11 +61,15 @@ export async function GET() {
 
 export async function POST(req: NextRequest) {
   const context = await requirePlatformAdmin();
-  if (!context) return NextResponse.json({ error: 'Sem permissão para cadastrar estacionamentos.' }, { status: 403 });
+  if (!context)
+    return NextResponse.json({ error: 'Sem permissão para cadastrar estacionamentos.' }, { status: 403 });
 
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Preencha todos os campos. A senha provisória precisa ter pelo menos 8 caracteres.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Preencha todos os campos. A senha provisória precisa ter pelo menos 8 caracteres.' },
+      { status: 400 },
+    );
   }
 
   const admin = createAdminClient();
@@ -75,56 +83,37 @@ export async function POST(req: NextRequest) {
   });
 
   if (authError || !authData.user) {
-    return NextResponse.json({ error: authError?.message || 'Não foi possível criar o usuário proprietário.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Não foi possível criar o usuário proprietário. Verifique se o e-mail já está cadastrado.' },
+      { status: 500 },
+    );
   }
 
-  const { data: organization, error: orgError } = await admin
-    .from('organizations')
-    .insert({ name: parsed.data.organizationName, slug })
-    .select('id,name,slug')
-    .single();
-
-  if (orgError || !organization) {
-    await admin.auth.admin.deleteUser(authData.user.id);
-    return NextResponse.json({ error: orgError?.message || 'Não foi possível criar o estacionamento.' }, { status: 500 });
-  }
-
-  const { error: profileError } = await admin.from('profiles').insert({
-    id: authData.user.id,
-    organization_id: organization.id,
-    name: parsed.data.ownerName,
-    role: 'owner',
-    active: true,
-    must_change_password: true,
+  const { data: organization, error: provisionError } = await admin.rpc('provision_organization_atomic', {
+    p_owner_user_id: authData.user.id,
+    p_organization_name: parsed.data.organizationName,
+    p_slug: slug,
+    p_owner_name: parsed.data.ownerName,
   });
 
-  if (profileError) {
-    await admin.from('organizations').delete().eq('id', organization.id);
-    await admin.auth.admin.deleteUser(authData.user.id);
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
+  if (provisionError || !organization) {
+    const { error: compensationError } = await admin.auth.admin.deleteUser(authData.user.id);
+    return NextResponse.json(
+      {
+        error: compensationError
+          ? 'Falha ao cadastrar e ao desfazer o usuário. Contate o suporte.'
+          : 'Não foi possível criar o estacionamento. Nenhum cadastro parcial foi mantido.',
+      },
+      { status: 500 },
+    );
   }
 
-  const { error: tariffError } = await admin.from('tariff_plans').insert({
-    organization_id: organization.id,
-    name: 'Padrão',
-    tolerance_minutes: 10,
-    first_hour_price: 10,
-    additional_hour_price: 7,
-    fraction_minutes: 30,
-    daily_max: 45,
-    is_default: true,
-    active: true,
-  });
-
-  if (tariffError) {
-    await admin.from('organizations').delete().eq('id', organization.id);
-    await admin.auth.admin.deleteUser(authData.user.id);
-    return NextResponse.json({ error: tariffError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({
-    ok: true,
-    organization,
-    owner: { id: authData.user.id, email: parsed.data.email, mustChangePassword: true },
-  }, { status: 201 });
+  return NextResponse.json(
+    {
+      ok: true,
+      organization,
+      owner: { id: authData.user.id, email: parsed.data.email, mustChangePassword: true },
+    },
+    { status: 201 },
+  );
 }

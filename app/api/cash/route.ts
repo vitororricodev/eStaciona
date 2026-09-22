@@ -1,7 +1,87 @@
-import { NextRequest,NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getContext } from '@/lib/authz';
 import { z } from 'zod';
-function expected(opening:number,cashPayments:number,supply:number,withdrawal:number){return Math.round((opening+cashPayments+supply-withdrawal)*100)/100}
-export async function GET(){const {supabase,user,profile}=await getContext();if(!profile||!user)return NextResponse.json({error:'Sem sessão'},{status:401});const {data:session}=await supabase.from('cash_sessions').select('*').eq('organization_id',profile.organization_id).eq('user_id',user.id).eq('status','open').maybeSingle();if(!session)return NextResponse.json({session:null});const [{data:pays},{data:movs}]=await Promise.all([supabase.from('payments').select('amount,method,status').eq('cash_session_id',session.id).eq('status','paid'),supabase.from('cash_movements').select('*').eq('cash_session_id',session.id).order('created_at')]);const cash=(pays||[]).filter((p:any)=>p.method==='cash').reduce((s:any,p:any)=>s+Number(p.amount),0);const supply=(movs||[]).filter((m:any)=>m.type==='supply').reduce((s:any,m:any)=>s+Number(m.amount),0);const withdrawal=(movs||[]).filter((m:any)=>m.type==='withdrawal').reduce((s:any,m:any)=>s+Number(m.amount),0);return NextResponse.json({session:{...session,expected:expected(Number(session.opening_amount),cash,supply,withdrawal),cashPayments:cash,supply,withdrawal,movements:movs||[]}});}
-const openSchema=z.object({openingAmount:z.coerce.number().min(0).max(999999)});const closeSchema=z.object({closingAmount:z.coerce.number().min(0).max(999999),notes:z.string().max(300).optional()});
-export async function POST(req:NextRequest){const body=await req.json();const {supabase,user,profile}=await getContext();if(!profile||!user)return NextResponse.json({error:'Sem sessão'},{status:401});if(body.action==='open'){const p=openSchema.safeParse(body);if(!p.success)return NextResponse.json({error:'Valor inicial inválido'},{status:400});const {data,error}=await supabase.from('cash_sessions').insert({organization_id:profile.organization_id,user_id:user.id,opening_amount:p.data.openingAmount}).select().single();return error?NextResponse.json({error:error.message},{status:409}):NextResponse.json({session:data},{status:201});}if(body.action==='close'){const p=closeSchema.safeParse(body);if(!p.success)return NextResponse.json({error:'Valor final inválido'},{status:400});const check=await GET();const json=await check.json();if(!json.session)return NextResponse.json({error:'Nenhum caixa aberto'},{status:409});const expectedValue=Number(json.session.expected);const difference=Math.round((p.data.closingAmount-expectedValue)*100)/100;const {data,error}=await supabase.from('cash_sessions').update({status:'closed',closed_at:new Date().toISOString(),closing_amount:p.data.closingAmount,expected_cash:expectedValue,difference,notes:p.data.notes||null}).eq('id',json.session.id).select().single();if(error)return NextResponse.json({error:error.message},{status:500});await supabase.from('audit_logs').insert({organization_id:profile.organization_id,actor_user_id:user.id,action:'cash.closed',entity:'cash_session',entity_id:data.id,metadata:{expected:expectedValue,closing:p.data.closingAmount,difference}});return NextResponse.json({session:data});}return NextResponse.json({error:'Ação inválida'},{status:400});}
+function expected(opening: number, cashPayments: number, supply: number, withdrawal: number) {
+  return Math.round((opening + cashPayments + supply - withdrawal) * 100) / 100;
+}
+export async function GET() {
+  const { supabase, user, profile } = await getContext();
+  if (!profile || !user) return NextResponse.json({ error: 'Sem sessão' }, { status: 401 });
+  const { data: session } = await supabase
+    .from('cash_sessions')
+    .select('*')
+    .eq('organization_id', profile.organization_id)
+    .eq('user_id', user.id)
+    .eq('status', 'open')
+    .maybeSingle();
+  if (!session) return NextResponse.json({ session: null });
+  const [{ data: pays }, { data: movs }] = await Promise.all([
+    supabase
+      .from('payments')
+      .select('amount,method,status')
+      .eq('cash_session_id', session.id)
+      .eq('status', 'paid'),
+    supabase.from('cash_movements').select('*').eq('cash_session_id', session.id).order('created_at'),
+  ]);
+  const cash = (pays || [])
+    .filter((p: any) => p.method === 'cash')
+    .reduce((s: any, p: any) => s + Number(p.amount), 0);
+  const supply = (movs || [])
+    .filter((m: any) => m.type === 'supply')
+    .reduce((s: any, m: any) => s + Number(m.amount), 0);
+  const withdrawal = (movs || [])
+    .filter((m: any) => m.type === 'withdrawal')
+    .reduce((s: any, m: any) => s + Number(m.amount), 0);
+  return NextResponse.json({
+    session: {
+      ...session,
+      expected: expected(Number(session.opening_amount), cash, supply, withdrawal),
+      cashPayments: cash,
+      supply,
+      withdrawal,
+      movements: movs || [],
+    },
+  });
+}
+const openSchema = z.object({ openingAmount: z.coerce.number().min(0).max(999999) });
+const closeSchema = z.object({
+  closingAmount: z.coerce.number().min(0).max(999999),
+  notes: z.string().max(300).optional(),
+});
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const { supabase, user, profile } = await getContext();
+  if (!profile || !user) return NextResponse.json({ error: 'Sem sessão' }, { status: 401 });
+  if (body.action === 'open') {
+    const p = openSchema.safeParse(body);
+    if (!p.success) return NextResponse.json({ error: 'Valor inicial inválido' }, { status: 400 });
+    const { data, error } = await supabase
+      .from('cash_sessions')
+      .insert({
+        organization_id: profile.organization_id,
+        user_id: user.id,
+        opening_amount: p.data.openingAmount,
+      })
+      .select()
+      .single();
+    return error
+      ? NextResponse.json({ error: 'Não foi possível abrir o caixa.' }, { status: 409 })
+      : NextResponse.json({ session: data }, { status: 201 });
+  }
+  if (body.action === 'close') {
+    const p = closeSchema.safeParse(body);
+    if (!p.success) return NextResponse.json({ error: 'Valor final inválido' }, { status: 400 });
+    const { data, error } = await supabase.rpc('close_cash_session_atomic', {
+      p_closing_amount: p.data.closingAmount,
+      p_notes: p.data.notes || null,
+    });
+    if (error) {
+      const message = error.message || '';
+      if (message.includes('cash_session_not_open'))
+        return NextResponse.json({ error: 'Nenhum caixa aberto' }, { status: 409 });
+      return NextResponse.json({ error: 'Não foi possível fechar o caixa.' }, { status: 500 });
+    }
+    return NextResponse.json({ session: data });
+  }
+  return NextResponse.json({ error: 'Ação inválida' }, { status: 400 });
+}

@@ -1,4 +1,4 @@
-# eStaciona 1.0.0 — MVP comercial
+# eStaciona 1.0.12 — candidato não publicado
 
 **eStaciona — O controle do seu pátio na palma da mão.**
 
@@ -7,6 +7,7 @@ SaaS mobile-first para estacionamentos, preparado para **Vercel + Supabase**.
 ## O que está entregue
 
 ### eStaciona Operação
+
 - entrada rápida por placa;
 - reaproveitamento automático de cliente/veículo recorrente;
 - tarifa automática ou manual;
@@ -20,8 +21,9 @@ SaaS mobile-first para estacionamentos, preparado para **Vercel + Supabase**.
 - cancelamento auditado com permissão de gerente/proprietário.
 
 ### eStaciona Cliente
+
 - portal por token seguro;
-- consulta alternativa pela placa + 4 últimos dígitos do telefone;
+- consulta alternativa pela placa + WhatsApp completo cadastrado;
 - placa, veículo, entrada e tempo em tempo real;
 - valor atual com estacionamento + serviços;
 - resumo da tarifa aplicada;
@@ -31,6 +33,7 @@ SaaS mobile-first para estacionamentos, preparado para **Vercel + Supabase**.
 > O botão de pagamento online aparece como indisponível até um provedor PIX ser escolhido e configurado. O MVP não inventa um gateway nem cria cobrança financeira simulada em produção.
 
 ### eStaciona Gestão
+
 - dashboard diário;
 - movimentações;
 - relatórios de 7/30/90/365 dias;
@@ -44,6 +47,7 @@ SaaS mobile-first para estacionamentos, preparado para **Vercel + Supabase**.
 - trilha de auditoria.
 
 ### Caixa
+
 - abertura por operador;
 - suprimento;
 - sangria (gerente/proprietário);
@@ -54,6 +58,7 @@ SaaS mobile-first para estacionamentos, preparado para **Vercel + Supabase**.
 ## Motor tarifário
 
 Centralizado em `domain/pricing.ts`:
+
 - tolerância;
 - primeira faixa configurável;
 - frações adicionais com arredondamento para cima;
@@ -94,17 +99,21 @@ Execute **nesta ordem** em um projeto Supabase novo:
 2. `supabase/migrations/002_tariffs_advanced.sql`
 3. `supabase/migrations/003_mvp_complete.sql`
 4. `supabase/migrations/004_hardening.sql`
+5. `supabase/migrations/005_admin_onboarding.sql`
+6. `supabase/migrations/006_stay_customer_flags.sql`
+7. `supabase/migrations/007_atomic_operations_and_tariff_snapshot.sql`
+8. `supabase/migrations/008_security_rls_rate_limit_and_provisioning.sql`
 
-Em uma instalação 1.0.3 existente, execute apenas `supabase/migrations/004_hardening.sql`.
+Em instalações existentes, aplique somente as migrations ainda não registradas, sempre na ordem numérica e primeiro em homologação.
 
 ## Primeiro acesso
 
 1. Crie o projeto no Supabase.
-2. Rode as 4 migrations.
+2. Rode as 8 migrations, em ordem numérica.
 3. Crie o primeiro usuário em **Authentication > Users**.
 4. Rode o bootstrap comentado no fim de `001_initial.sql` para criar organização, perfil `owner` e tarifa padrão.
 5. Configure `.env.local` a partir de `.env.example`.
-6. Rode `npm install` e `npm run dev`.
+6. Rode `npm ci` e `npm run dev`.
 
 ## Vercel
 
@@ -119,6 +128,7 @@ Em uma instalação 1.0.3 existente, execute apenas `supabase/migrations/004_har
 Sem configuração externa, o operador usa o link de compartilhamento do WhatsApp normalmente.
 
 Para envio automático, configure:
+
 - `WHATSAPP_ACCESS_TOKEN`
 - `WHATSAPP_PHONE_NUMBER_ID`
 - `WHATSAPP_ENTRY_TEMPLATE`
@@ -132,9 +142,9 @@ O MVP registra PIX no balcão como forma de pagamento. O **PIX online no Portal 
 ## Validação antes de produção
 
 Antes de colocar clientes reais:
-- rode `npm install`;
-- rode `npm run typecheck`;
-- rode `npm run build`;
+
+- rode `npm ci`;
+- rode `npm run verify`;
 - teste as migrations em um projeto Supabase de homologação;
 - teste RLS usando duas organizações diferentes;
 - teste câmera/QR em Android e iPhone;
@@ -144,7 +154,15 @@ Antes de colocar clientes reais:
 
 ## Versão
 
-`1.0.0` — MVP comercial funcional, com integrações externas opcionais condicionadas às credenciais/provedores do cliente.
+`1.0.12` — candidato local; não implica publicação em produção.
+
+## Rate limiting
+
+As rotas públicas usam a tabela `api_rate_limits` e a RPC `consume_rate_limit`, criadas pela migration 008. Configure `RATE_LIMIT_SECRET` como segredo server-only; na ausência dele, o backend usa a service role como chave de HMAC. Nenhum IP, placa, telefone ou token é persistido em texto aberto pelo limitador.
+
+## Vault do projeto
+
+A pasta `vault/` é parte obrigatória do eStaciona. Antes de qualquer alteração, leia `vault/00-INDEX.md`, `vault/05-CONTEXTO-PARA-IA-PROMPT-BASE.md` e o documento do domínio afetado. Depois da alteração, atualize o Vault e mantenha-o dentro do pacote entregue. O processo completo está em `vault/14-PROTOCOLO-DE-ATUALIZACAO-DO-VAULT.md`.
 
 ## Consulta automática de placa
 

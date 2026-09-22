@@ -1,4 +1,92 @@
 'use client';
-import { useEffect,useMemo,useState } from 'react';import { AppShell } from '@/components/AppShell';import { AdminNav } from '@/components/AdminNav';import { formatDuration } from '@/domain/pricing';
-export default function Page(){const [days,setDays]=useState(30);const [d,setD]=useState<any>(null);useEffect(()=>{fetch(`/api/reports?days=${days}`).then(r=>r.json()).then(setD)},[days]);const max=useMemo(()=>Math.max(1,...((d?.byDay||[]).map((x:any)=>Number(x[1])))),[d]);return <AppShell title="Gestão"><AdminNav/><div className="flex flex-wrap items-end justify-between gap-4"><div><h1 className="text-3xl font-black">Relatórios</h1><p className="mt-2 text-slate-500">Desempenho operacional e financeiro.</p></div><select value={days} onChange={e=>setDays(Number(e.target.value))} className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold"><option value={7}>7 dias</option><option value={30}>30 dias</option><option value={90}>90 dias</option><option value={365}>365 dias</option></select></div>{!d?<p className="mt-8">Carregando...</p>:<><div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><K label="Faturamento" value={`R$ ${Number(d.summary?.revenue||0).toFixed(2).replace('.',',')}`}/><K label="Entradas" value={String(d.summary?.entries||0)}/><K label="Ticket médio" value={`R$ ${Number(d.summary?.ticketAverage||0).toFixed(2).replace('.',',')}`}/><K label="Permanência média" value={formatDuration(Math.round(d.summary?.averageMinutes||0))}/></div><div className="mt-6 rounded-3xl bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Receita por dia</h2><div className="mt-5 flex h-48 items-end gap-2 overflow-x-auto">{(d.byDay||[]).map(([day,val]:any)=><div key={day} className="flex min-w-10 flex-1 flex-col items-center gap-2"><div title={`R$ ${Number(val).toFixed(2)}`} className="w-full rounded-t-xl bg-brand-500" style={{height:`${Math.max(5,Number(val)/max*150)}px`}}/><span className="text-[10px] text-slate-400">{day.slice(5)}</span></div>)}</div></div><div className="mt-6 rounded-3xl bg-white p-6 shadow-sm"><h2 className="text-xl font-black">Por forma de pagamento</h2><div className="mt-4 grid gap-3 sm:grid-cols-4">{Object.entries(d.byMethod||{}).map(([k,v]:any)=><div key={k} className="rounded-2xl bg-slate-50 p-4"><p className="text-xs font-bold uppercase text-slate-400">{k}</p><p className="mt-1 text-xl font-black">R$ {Number(v).toFixed(2).replace('.',',')}</p></div>)}</div></div></>}</AppShell>}
-function K({label,value}:{label:string;value:string}){return <div className="rounded-3xl bg-white p-5 shadow-sm"><p className="text-sm font-bold text-slate-400">{label}</p><p className="mt-2 text-2xl font-black">{value}</p></div>}
+import { useEffect, useMemo, useState } from 'react';
+import { AppShell } from '@/components/AppShell';
+import { AdminNav } from '@/components/AdminNav';
+import { formatDuration } from '@/domain/pricing';
+export default function Page() {
+  const [days, setDays] = useState(30);
+  const [d, setD] = useState<any>(null);
+  useEffect(() => {
+    fetch(`/api/reports?days=${days}`)
+      .then((r) => r.json())
+      .then(setD);
+  }, [days]);
+  const max = useMemo(() => Math.max(1, ...(d?.byDay || []).map((x: any) => Number(x[1]))), [d]);
+  return (
+    <AppShell title="Gestão">
+      <AdminNav />
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-black">Relatórios</h1>
+          <p className="mt-2 text-slate-500">Desempenho operacional e financeiro.</p>
+        </div>
+        <select
+          value={days}
+          onChange={(e) => setDays(Number(e.target.value))}
+          className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold"
+        >
+          <option value={7}>7 dias</option>
+          <option value={30}>30 dias</option>
+          <option value={90}>90 dias</option>
+          <option value={365}>365 dias</option>
+        </select>
+      </div>
+      {!d ? (
+        <p className="mt-8">Carregando...</p>
+      ) : (
+        <>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <K
+              label="Faturamento"
+              value={`R$ ${Number(d.summary?.revenue || 0)
+                .toFixed(2)
+                .replace('.', ',')}`}
+            />
+            <K label="Entradas" value={String(d.summary?.entries || 0)} />
+            <K
+              label="Ticket médio"
+              value={`R$ ${Number(d.summary?.ticketAverage || 0)
+                .toFixed(2)
+                .replace('.', ',')}`}
+            />
+            <K label="Permanência média" value={formatDuration(Math.round(d.summary?.averageMinutes || 0))} />
+          </div>
+          <div className="mt-6 rounded-3xl bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black">Receita por dia</h2>
+            <div className="mt-5 flex h-48 items-end gap-2 overflow-x-auto">
+              {(d.byDay || []).map(([day, val]: any) => (
+                <div key={day} className="flex min-w-10 flex-1 flex-col items-center gap-2">
+                  <div
+                    title={`R$ ${Number(val).toFixed(2)}`}
+                    className="w-full rounded-t-xl bg-brand-500"
+                    style={{ height: `${Math.max(5, (Number(val) / max) * 150)}px` }}
+                  />
+                  <span className="text-[10px] text-slate-400">{day.slice(5)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-6 rounded-3xl bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-black">Por forma de pagamento</h2>
+            <div className="mt-4 grid gap-3 sm:grid-cols-4">
+              {Object.entries(d.byMethod || {}).map(([k, v]: any) => (
+                <div key={k} className="rounded-2xl bg-slate-50 p-4">
+                  <p className="text-xs font-bold uppercase text-slate-400">{k}</p>
+                  <p className="mt-1 text-xl font-black">R$ {Number(v).toFixed(2).replace('.', ',')}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+    </AppShell>
+  );
+}
+function K({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-3xl bg-white p-5 shadow-sm">
+      <p className="text-sm font-bold text-slate-400">{label}</p>
+      <p className="mt-2 text-2xl font-black">{value}</p>
+    </div>
+  );
+}

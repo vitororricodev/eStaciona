@@ -1,0 +1,219 @@
+{
+  "main": {
+    "id": "14f16992d693910d",
+    "type": "split",
+    "children": [
+      {
+        "id": "d81c6fee804aac16",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "238bb77caff6d09c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "10-MUDANCAS-RECENTES-E-LOGS.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "10-MUDANCAS-RECENTES-E-LOGS"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "1895427b70df77ac",
+    "type": "split",
+    "children": [
+      {
+        "id": "95ecce1c21c238df",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "e8d5b7973bcb4317",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de arquivos"
+            }
+          },
+          {
+            "id": "64c65ad94a274716",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Procurar"
+            }
+          },
+          {
+            "id": "78b78b0bcc70d7a6",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "8cefa0ce274c808f",
+    "type": "split",
+    "children": [
+      {
+        "id": "4eeaab1a16c5dc38",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "509f26cad40799a8",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "08-DEPLOY-E-AMBIENTE/02-env.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Links inversos"
+            }
+          },
+          {
+            "id": "0253bee5eee425de",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "08-DEPLOY-E-AMBIENTE/02-env.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Links de saída"
+            }
+          },
+          {
+            "id": "7a26c6f4e3bbf22e",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "a5281de433f39bdc",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas as propriedades"
+            }
+          },
+          {
+            "id": "ddf442410f6b1353",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "08-DEPLOY-E-AMBIENTE/02-env.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Sumário"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir a troca rápida": false,
+      "graph:Abrir visualização em gráfico": false,
+      "canvas:Criar novo canvas": false,
+      "daily-notes:Abrir a nota de hoje": false,
+      "templates:Inserir modelo": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Criar nova base": false
+    }
+  },
+  "active": "238bb77caff6d09c",
+  "lastOpenFiles": [
+    "11-LACUNAS-RISCOS-E-DECISOES.md",
+    "13-AUDITORIA-DO-CODIGO-MAIN.md",
+    "12-INVENTARIO-E-RASTREABILIDADE.md",
+    "10-MUDANCAS-RECENTES-E-LOGS.md",
+    "09-DEPLOY-AMBIENTE-E-OPERACAO.md",
+    "08-UX-UI-E-IDENTIDADE.md",
+    "07-SEGURANCA-AUTENTICACAO-E-ACESSO.md",
+    "06-MODULOS-E-FLUXOS.md",
+    "05-CONTEXTO-PARA-IA-PROMPT-BASE.md",
+    "04-GUIA-DE-DESENVOLVIMENTO-E-CONTRIBUICAO.md",
+    "03-ESTRUTURA-DE-DADOS-E-API.md",
+    "02-ARQUITETURA-E-DESIGN.md",
+    "01-VISAO-GERAL-E-NEGOCIO.md",
+    "00-INDEX.md",
+    "eStaciona-Vault-Documentacao-1.0.11.zip",
+    "01-PRODUTO/02-funcionalidades.md",
+    "01-PRODUTO/01-proposta-e-problema.md",
+    "12-PITCH/01-pitch.md",
+    "05-AUTENTICACAO-E-ACESSO/02-onboarding.md",
+    "08-DEPLOY-E-AMBIENTE/02-env.md",
+    "README.md",
+    "05-AUTENTICACAO-E-ACESSO/01-papeis.md",
+    "01-PRODUTO/03-modelo-saas.md",
+    "00-INDICE/00-MAPA.md",
+    "00-INDICE/01-visao-geral.md"
+  ]
+}

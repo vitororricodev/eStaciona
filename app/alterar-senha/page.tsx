@@ -2,9 +2,9 @@
 
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { BackButton } from '@/components/BackButton';
 
 export default function AlterarSenhaPage() {
   const [error, setError] = useState('');
@@ -29,17 +29,14 @@ export default function AlterarSenhaPage() {
       return;
     }
 
-    const supabase = createClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password });
-    if (updateError) {
-      setError('Não foi possível alterar a senha.');
-      setLoading(false);
-      return;
-    }
-
-    const response = await fetch('/api/account/password-changed', { method: 'POST' });
+    const response = await fetch('/api/account/password-changed', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newPassword: password }),
+    });
     if (!response.ok) {
-      setError('Senha alterada, mas não foi possível concluir o primeiro acesso. Tente novamente.');
+      const data = await response.json().catch(() => ({}));
+      setError(data.error || 'Não foi possível concluir a troca de senha.');
       setLoading(false);
       return;
     }
@@ -50,19 +47,47 @@ export default function AlterarSenhaPage() {
 
   return (
     <main className="grid min-h-screen place-items-center bg-gradient-to-b from-brand-50 to-white p-4 dark:from-slate-950 dark:to-slate-900">
-      <div className="fixed right-4 top-4"><ThemeToggle /></div>
+      <div className="fixed left-4 top-4">
+        <BackButton fallback="/login" />
+      </div>
+      <div className="fixed right-4 top-4">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
-        <div className="mb-6 flex justify-center"><BrandLogo /></div>
+        <div className="mb-6 flex justify-center">
+          <BrandLogo />
+        </div>
         <form onSubmit={submit} className="rounded-[2rem] bg-white p-7 shadow-soft ring-1 ring-brand-100">
           <p className="text-xs font-black tracking-[.16em] text-brand-600">PRIMEIRO ACESSO</p>
           <h1 className="mt-2 text-3xl font-black">Crie sua nova senha</h1>
-          <p className="mt-2 text-slate-500">Por segurança, a senha provisória deve ser substituída antes de acessar o sistema.</p>
+          <p className="mt-2 text-slate-500">
+            Por segurança, a senha provisória deve ser substituída antes de acessar o sistema.
+          </p>
           <label className="mt-6 block text-sm font-semibold">Nova senha</label>
-          <input name="password" type="password" minLength={8} required className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500" />
+          <input
+            name="password"
+            type="password"
+            minLength={8}
+            required
+            className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500"
+          />
           <label className="mt-4 block text-sm font-semibold">Confirme a nova senha</label>
-          <input name="confirm" type="password" minLength={8} required className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500" />
-          {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
-          <button disabled={loading} className="mt-6 w-full rounded-2xl bg-brand-700 px-4 py-3 font-bold text-white shadow-brand disabled:opacity-60">
+          <input
+            name="confirm"
+            type="password"
+            minLength={8}
+            required
+            className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-brand-500"
+          />
+          {error && (
+            <p role="alert" className="mt-4 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+          <button
+            disabled={loading}
+            className="mt-6 w-full rounded-2xl bg-brand-700 px-4 py-3 font-bold text-white shadow-brand disabled:opacity-60"
+          >
             {loading ? 'Salvando...' : 'Alterar senha e continuar'}
           </button>
         </form>

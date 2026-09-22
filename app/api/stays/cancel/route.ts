@@ -1,5 +1,37 @@
-import { NextRequest,NextResponse } from 'next/server';
-import { getContext,canManage } from '@/lib/authz';
+import { NextRequest, NextResponse } from 'next/server';
+import { getContext, canManage } from '@/lib/authz';
 import { z } from 'zod';
-const schema=z.object({stayId:z.string().uuid(),reason:z.string().trim().min(5).max(300)});
-export async function POST(req:NextRequest){const p=schema.safeParse(await req.json());if(!p.success)return NextResponse.json({error:'Informe um motivo válido'},{status:400});const {supabase,user,profile}=await getContext();if(!profile||!canManage(profile.role))return NextResponse.json({error:'Cancelamento exige gerente ou proprietário.'},{status:403});const now=new Date().toISOString();const {data,error}=await supabase.from('stays').update({status:'cancelled',cancelled_at:now,cancelled_by:user?.id,cancellation_reason:p.data.reason}).eq('id',p.data.stayId).eq('organization_id',profile.organization_id).eq('status','open').select().maybeSingle();if(error)return NextResponse.json({error:error.message},{status:500});if(!data)return NextResponse.json({error:'Permanência não encontrada ou já encerrada.'},{status:409});await supabase.from('audit_logs').insert({organization_id:profile.organization_id,actor_user_id:user?.id,action:'stay.cancelled',entity:'stay',entity_id:data.id,metadata:{reason:p.data.reason}});return NextResponse.json({ok:true});}
+const schema = z.object({ stayId: z.string().uuid(), reason: z.string().trim().min(5).max(300) });
+export async function POST(req: NextRequest) {
+  const p = schema.safeParse(await req.json());
+  if (!p.success) return NextResponse.json({ error: 'Informe um motivo válido' }, { status: 400 });
+  const { supabase, user, profile } = await getContext();
+  if (!profile || !canManage(profile.role))
+    return NextResponse.json({ error: 'Cancelamento exige gerente ou proprietário.' }, { status: 403 });
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from('stays')
+    .update({
+      status: 'cancelled',
+      cancelled_at: now,
+      cancelled_by: user?.id,
+      cancellation_reason: p.data.reason,
+    })
+    .eq('id', p.data.stayId)
+    .eq('organization_id', profile.organization_id)
+    .eq('status', 'open')
+    .select()
+    .maybeSingle();
+  if (error) return NextResponse.json({ error: 'Não foi possível cancelar a permanência.' }, { status: 500 });
+  if (!data)
+    return NextResponse.json({ error: 'Permanência não encontrada ou já encerrada.' }, { status: 409 });
+  await supabase.from('audit_logs').insert({
+    organization_id: profile.organization_id,
+    actor_user_id: user?.id,
+    action: 'stay.cancelled',
+    entity: 'stay',
+    entity_id: data.id,
+    metadata: { reason: p.data.reason },
+  });
+  return NextResponse.json({ ok: true });
+}

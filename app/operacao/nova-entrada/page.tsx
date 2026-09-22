@@ -33,7 +33,9 @@ export default function NovaEntradaPage() {
   useEffect(() => {
     fetch('/api/tariffs?active=true')
       .then((r) => r.json())
-      .then((d) => { if (!d.error) setTariffs(d.tariffs || []); });
+      .then((d) => {
+        if (!d.error) setTariffs(d.tariffs || []);
+      });
   }, []);
 
   const lookup = useCallback(async () => {
@@ -64,7 +66,9 @@ export default function NovaEntradaPage() {
       setExisting(null);
       fetch(`/api/vehicles/external?plate=${clean}`)
         .then((response) => response.json())
-        .then((x) => { if (x.found) setExternalVehicle(x.vehicle); })
+        .then((x) => {
+          if (x.found) setExternalVehicle(x.vehicle);
+        })
         .catch(() => {});
     }
   }, [plate]);
@@ -86,7 +90,9 @@ export default function NovaEntradaPage() {
     setLoading(true);
     setError('');
     const f = new FormData(e.currentTarget);
-    const body: any = Object.fromEntries(['plate', 'name', 'phone', 'make', 'model', 'color'].map((k) => [k, f.get(k)]));
+    const body: any = Object.fromEntries(
+      ['plate', 'name', 'phone', 'make', 'model', 'color'].map((k) => [k, f.get(k)]),
+    );
     body.plate = cleanPlate;
     body.tariffPlanId = tariffPlanId || null;
     body.hasParkingTag = hasParkingTag;
@@ -128,11 +134,21 @@ export default function NovaEntradaPage() {
           <p className="mt-2 text-slate-500">{vehiclePlate} já está no pátio. Portal e QR prontos.</p>
 
           <div className="mt-4 flex flex-wrap gap-2">
-            {result.has_parking_tag && <span className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700">TAG</span>}
-            {result.is_monthly && <span className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-bold text-violet-700">Mensalista</span>}
+            {result.has_parking_tag && (
+              <span className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700">
+                TAG
+              </span>
+            )}
+            {result.is_monthly && (
+              <span className="rounded-full bg-violet-50 px-3 py-1.5 text-xs font-bold text-violet-700">
+                Mensalista
+              </span>
+            )}
           </div>
 
-          {qr && <img src={qr} alt="QR da permanência" className="mx-auto my-6 w-full max-w-64 rounded-2xl" />}
+          {qr && (
+            <img src={qr} alt="QR da permanência" className="mx-auto my-6 w-full max-w-64 rounded-2xl" />
+          )}
 
           <a
             target="_blank"
@@ -142,24 +158,42 @@ export default function NovaEntradaPage() {
           >
             <Send size={18} /> Enviar ticket no WhatsApp
           </a>
-          <p className="mt-2 text-center text-xs text-slate-500">O WhatsApp abrirá com a mensagem pronta. Basta tocar em enviar.</p>
+          <p className="mt-2 text-center text-xs text-slate-500">
+            O WhatsApp abrirá com a mensagem pronta. Basta tocar em enviar.
+          </p>
 
           <div className="mt-4 grid gap-2 sm:grid-cols-2">
-            <Link href="/operacao/nova-entrada" className="rounded-2xl border border-slate-200 px-4 py-3 text-center font-bold">Nova entrada</Link>
-            <Link href="/operacao" className="rounded-2xl bg-brand-50 px-4 py-3 text-center font-bold text-brand-700">Voltar</Link>
+            <Link
+              href="/operacao/nova-entrada"
+              className="rounded-2xl border border-slate-200 px-4 py-3 text-center font-bold"
+            >
+              Nova entrada
+            </Link>
+            <Link
+              href="/operacao"
+              className="rounded-2xl bg-brand-50 px-4 py-3 text-center font-bold text-brand-700"
+            >
+              Voltar
+            </Link>
           </div>
         </div>
       </AppShell>
     );
   }
 
-  const customer = existing ? (Array.isArray(existing.customers) ? existing.customers[0] : existing.customers) : null;
+  const customer = existing
+    ? Array.isArray(existing.customers)
+      ? existing.customers[0]
+      : existing.customers
+    : null;
 
   return (
     <AppShell title="Nova entrada">
       <form onSubmit={submit} className="mx-auto max-w-xl rounded-[2rem] bg-white p-4 shadow-soft sm:p-6">
         <h1 className="text-2xl font-black sm:text-3xl">Nova entrada</h1>
-        <p className="mt-2 text-sm text-slate-500 sm:text-base">A placa é o identificador principal. Cliente recorrente entra em poucos toques.</p>
+        <p className="mt-2 text-sm text-slate-500 sm:text-base">
+          A placa é o identificador principal. Cliente recorrente entra em poucos toques.
+        </p>
 
         <label className="mt-5 block text-sm font-bold text-slate-700">
           Placa
@@ -186,7 +220,9 @@ export default function NovaEntradaPage() {
               {lookupLoading ? <Loader2 className="animate-spin" /> : <Search />}
             </button>
           </div>
-          <span className={`mt-2 block text-xs ${plate && !validPlate ? 'text-red-600' : validPlate ? 'text-emerald-600' : 'text-slate-500'}`}>
+          <span
+            className={`mt-2 block text-xs ${plate && !validPlate ? 'text-red-600' : validPlate ? 'text-emerald-600' : 'text-slate-500'}`}
+          >
             {plateFormatHint(plate) || 'Formatos aceitos: ABC1234 ou ABC1D23'}
           </span>
         </label>
@@ -197,8 +233,13 @@ export default function NovaEntradaPage() {
               <UserCheck className="mt-0.5 shrink-0 text-emerald-700" />
               <div className="min-w-0">
                 <p className="font-black text-emerald-900">Veículo recorrente encontrado</p>
-                <p className="break-words text-sm text-emerald-800">{[existing.make, existing.model, existing.color].filter(Boolean).join(' • ') || existing.plate}</p>
-                <p className="mt-1 break-words text-sm text-emerald-800">{customer?.name} • {customer?.phone}</p>
+                <p className="break-words text-sm text-emerald-800">
+                  {[existing.make, existing.model, existing.color].filter(Boolean).join(' • ') ||
+                    existing.plate}
+                </p>
+                <p className="mt-1 break-words text-sm text-emerald-800">
+                  {customer?.name} • {customer?.phone}
+                </p>
               </div>
             </div>
           </div>
@@ -206,12 +247,32 @@ export default function NovaEntradaPage() {
 
         {!existing && lookupDone && (
           <div className="mt-5">
-            <div className="rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">Primeira entrada desta placa. Complete o cadastro abaixo.</div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Field key={`make-${externalVehicle?.make || ''}`} name="make" label="Marca" placeholder="Volkswagen" defaultValue={externalVehicle?.make || ''} />
-              <Field key={`model-${externalVehicle?.model || ''}`} name="model" label="Modelo" placeholder="Fox" defaultValue={externalVehicle?.model || ''} />
+            <div className="rounded-2xl bg-brand-50 p-4 text-sm text-brand-800">
+              Primeira entrada desta placa. Complete o cadastro abaixo.
             </div>
-            <Field key={`color-${externalVehicle?.color || ''}`} name="color" label="Cor" placeholder="Prata" defaultValue={externalVehicle?.color || ''} />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field
+                key={`make-${externalVehicle?.make || ''}`}
+                name="make"
+                label="Marca"
+                placeholder="Volkswagen"
+                defaultValue={externalVehicle?.make || ''}
+              />
+              <Field
+                key={`model-${externalVehicle?.model || ''}`}
+                name="model"
+                label="Modelo"
+                placeholder="Fox"
+                defaultValue={externalVehicle?.model || ''}
+              />
+            </div>
+            <Field
+              key={`color-${externalVehicle?.color || ''}`}
+              name="color"
+              label="Cor"
+              placeholder="Prata"
+              defaultValue={externalVehicle?.color || ''}
+            />
             <div className="my-6 h-px bg-slate-100" />
             <Field name="name" label="Nome do cliente" placeholder="João da Silva" required />
             <Field name="phone" label="WhatsApp" placeholder="75999999999" required inputMode="tel" />
@@ -228,16 +289,34 @@ export default function NovaEntradaPage() {
           </>
         )}
 
-        {!lookupDone && <p className="mt-4 text-sm text-slate-500">Digite uma placa válida e toque na lupa para continuar.</p>}
+        {!lookupDone && (
+          <p className="mt-4 text-sm text-slate-500">
+            Digite uma placa válida e toque na lupa para continuar.
+          </p>
+        )}
 
         <div className="mt-5 grid gap-3 sm:grid-cols-2">
-          <label className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition ${hasParkingTag ? 'border-brand-300 bg-brand-50' : 'border-slate-200'}`}>
-            <input type="checkbox" checked={hasParkingTag} onChange={(e) => setHasParkingTag(e.target.checked)} className="h-5 w-5" />
+          <label
+            className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition ${hasParkingTag ? 'border-brand-300 bg-brand-50' : 'border-slate-200'}`}
+          >
+            <input
+              type="checkbox"
+              checked={hasParkingTag}
+              onChange={(e) => setHasParkingTag(e.target.checked)}
+              className="h-5 w-5"
+            />
             <BadgeCheck className="shrink-0 text-brand-600" size={20} />
             <span className="text-sm font-bold">Possui TAG</span>
           </label>
-          <label className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition ${isMonthly ? 'border-violet-300 bg-violet-50' : 'border-slate-200'}`}>
-            <input type="checkbox" checked={isMonthly} onChange={(e) => setIsMonthly(e.target.checked)} className="h-5 w-5" />
+          <label
+            className={`flex cursor-pointer items-center gap-3 rounded-2xl border p-4 transition ${isMonthly ? 'border-violet-300 bg-violet-50' : 'border-slate-200'}`}
+          >
+            <input
+              type="checkbox"
+              checked={isMonthly}
+              onChange={(e) => setIsMonthly(e.target.checked)}
+              className="h-5 w-5"
+            />
             <CalendarDays className="shrink-0 text-violet-600" size={20} />
             <span className="text-sm font-bold">Mensalista</span>
           </label>
@@ -246,17 +325,31 @@ export default function NovaEntradaPage() {
         <label className="mt-5 block text-sm font-bold text-slate-700">
           Tarifa
           <div className="mt-2">
-            <select value={tariffPlanId} onChange={(e) => setTariffPlanId(e.target.value)} className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-brand-500">
+            <select
+              value={tariffPlanId}
+              onChange={(e) => setTariffPlanId(e.target.value)}
+              className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-brand-500"
+            >
               <option value="">Automática (recomendada)</option>
-              {tariffs.map((t) => <option key={t.id} value={t.id}>{t.name}{t.is_default ? ' • padrão' : ''}</option>)}
+              {tariffs.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}
+                  {t.is_default ? ' • padrão' : ''}
+                </option>
+              ))}
             </select>
-            <p className="mt-2 text-xs text-slate-500">No modo automático, o eStaciona aplica a tabela ativa compatível com data/horário e prioridade.</p>
+            <p className="mt-2 text-xs text-slate-500">
+              No modo automático, o eStaciona aplica a tabela ativa compatível com data/horário e prioridade.
+            </p>
           </div>
         </label>
 
         {error && <p className="mt-4 break-words rounded-xl bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-        <button disabled={loading || !lookupDone || !validPlate || Boolean(error)} className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-4 text-base font-black text-white disabled:opacity-40 sm:text-lg">
+        <button
+          disabled={loading || !lookupDone || !validPlate || Boolean(error)}
+          className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-4 py-4 text-base font-black text-white disabled:opacity-40 sm:text-lg"
+        >
           {loading && <Loader2 className="animate-spin" />} Iniciar estacionamento
         </button>
       </form>
@@ -264,11 +357,32 @@ export default function NovaEntradaPage() {
   );
 }
 
-function Field({ name, label, placeholder, required, defaultValue, inputMode }: { name: string; label: string; placeholder: string; required?: boolean; defaultValue?: string; inputMode?: 'text' | 'tel' }) {
+function Field({
+  name,
+  label,
+  placeholder,
+  required,
+  defaultValue,
+  inputMode,
+}: {
+  name: string;
+  label: string;
+  placeholder: string;
+  required?: boolean;
+  defaultValue?: string;
+  inputMode?: 'text' | 'tel';
+}) {
   return (
     <label className="mt-4 block min-w-0 text-sm font-bold text-slate-700">
       {label}
-      <input name={name} placeholder={placeholder} required={required} defaultValue={defaultValue} inputMode={inputMode} className="mt-2 w-full min-w-0 rounded-2xl border border-slate-200 px-4 py-3 text-base outline-none focus:border-brand-500" />
+      <input
+        name={name}
+        placeholder={placeholder}
+        required={required}
+        defaultValue={defaultValue}
+        inputMode={inputMode}
+        className="mt-2 w-full min-w-0 rounded-2xl border border-slate-200 px-4 py-3 text-base outline-none focus:border-brand-500"
+      />
     </label>
   );
 }

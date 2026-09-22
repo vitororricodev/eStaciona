@@ -16,7 +16,7 @@ export async function GET() {
     .order('name');
 
   return error
-    ? NextResponse.json({ error: error.message }, { status: 500 })
+    ? NextResponse.json({ error: 'Não foi possível carregar a equipe.' }, { status: 500 })
     : NextResponse.json({ staff: data || [], viewerRole: profile.role });
 }
 
@@ -30,12 +30,19 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(await req.json());
   if (!parsed.success) {
-    return NextResponse.json({ error: 'Preencha nome, e-mail e uma senha com pelo menos 8 caracteres.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Preencha nome, e-mail e uma senha com pelo menos 8 caracteres.' },
+      { status: 400 },
+    );
   }
 
   const { profile, user } = await getContext();
   if (!profile || !canManage(profile.role)) {
     return NextResponse.json({ error: 'Apenas gestores podem cadastrar funcionários.' }, { status: 403 });
+  }
+
+  if (profile.role === 'manager' && parsed.data.role !== 'operator') {
+    return NextResponse.json({ error: 'Gerentes só podem cadastrar operadores.' }, { status: 403 });
   }
 
   const admin = createAdminClient();
@@ -47,7 +54,10 @@ export async function POST(req: NextRequest) {
   });
 
   if (error || !data.user) {
-    return NextResponse.json({ error: error?.message || 'Falha ao criar usuário.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Não foi possível criar o usuário. Verifique se o e-mail já está cadastrado.' },
+      { status: 500 },
+    );
   }
 
   const { error: profileError } = await admin.from('profiles').insert({
@@ -61,7 +71,10 @@ export async function POST(req: NextRequest) {
 
   if (profileError) {
     await admin.auth.admin.deleteUser(data.user.id);
-    return NextResponse.json({ error: profileError.message }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Não foi possível vincular o usuário à organização.' },
+      { status: 500 },
+    );
   }
 
   await admin.from('audit_logs').insert({

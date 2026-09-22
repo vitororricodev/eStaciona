@@ -1,6 +1,7 @@
 # TEST REPORT — eStaciona 1.0.5
 
 ## Revisão executada
+
 - 66 arquivos TypeScript/TSX analisados pelo parser do TypeScript.
 - 0 erros de sintaxe TS/TSX.
 - Imports internos `@/` validados contra o sistema de arquivos.
@@ -11,6 +12,7 @@
 - `.env.example` revisado sem chave secreta ou UUID administrativo preenchido.
 
 ## Fluxos revisados por código
+
 - Login normal preservado.
 - Primeiro login com senha provisória redireciona para `/alterar-senha`.
 - Middleware impede acesso a `/admin` e `/operacao` enquanto `must_change_password=true`.
@@ -21,4 +23,5 @@
 - Modo escuro persiste via `localStorage` e não altera os fluxos de negócio.
 
 ## Observação de ambiente
+
 O pacote foi validado estruturalmente e por parser TypeScript. O ambiente desta sessão não possui as dependências npm locais nem acesso à internet para executar um `next build` completo. O build final continua sendo validado pela Vercel após o push, como no deploy anterior já operacional.

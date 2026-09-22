@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 
   if (activeOnly) query = query.eq('active', true);
   const { data, error } = await query;
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Não foi possível carregar as tarifas.' }, { status: 500 });
   return NextResponse.json({ tariffs: data || [] });
 }
 
@@ -47,7 +47,8 @@ export async function POST(req: NextRequest) {
 
   const { supabase, user, profile } = await getContext();
   if (!profile) return NextResponse.json({ error: 'Perfil não configurado' }, { status: 403 });
-  if (!['owner', 'manager'].includes(profile.role)) return NextResponse.json({ error: 'Sem permissão para gerenciar tarifas.' }, { status: 403 });
+  if (!['owner', 'manager'].includes(profile.role))
+    return NextResponse.json({ error: 'Sem permissão para gerenciar tarifas.' }, { status: 403 });
 
   const input = parsed.data;
   if (input.is_default) {
@@ -56,7 +57,8 @@ export async function POST(req: NextRequest) {
       .update({ is_default: false })
       .eq('organization_id', profile.organization_id)
       .eq('is_default', true);
-    if (unset.error) return NextResponse.json({ error: unset.error.message }, { status: 500 });
+    if (unset.error)
+      return NextResponse.json({ error: 'Não foi possível atualizar a tarifa padrão.' }, { status: 500 });
   }
 
   const payload = {
@@ -72,7 +74,7 @@ export async function POST(req: NextRequest) {
   };
 
   const { data, error } = await supabase.from('tariff_plans').insert(payload).select().single();
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Não foi possível cadastrar a tarifa.' }, { status: 500 });
 
   await supabase.from('audit_logs').insert({
     organization_id: profile.organization_id,

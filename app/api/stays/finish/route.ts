@@ -23,7 +23,8 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error || !stay) return NextResponse.json({ error: 'Permanência não encontrada' }, { status: 404 });
-  if (stay.status !== 'open') return NextResponse.json({ error: 'Permanência já finalizada' }, { status: 409 });
+  if (stay.status !== 'open')
+    return NextResponse.json({ error: 'Permanência já finalizada' }, { status: 409 });
 
   const totals = stayTotals(stay);
 
@@ -36,7 +37,10 @@ export async function POST(req: NextRequest) {
     .maybeSingle();
 
   if (parsed.data.paymentMethod === 'cash' && !cashSession) {
-    return NextResponse.json({ error: 'Abra o caixa antes de receber pagamento em dinheiro.' }, { status: 409 });
+    return NextResponse.json(
+      { error: 'Abra o caixa antes de receber pagamento em dinheiro.' },
+      { status: 409 },
+    );
   }
 
   const metadata = {
@@ -57,10 +61,16 @@ export async function POST(req: NextRequest) {
 
   if (finishError) {
     const message = finishError.message || '';
-    if (message.includes('stay_not_open')) return NextResponse.json({ error: 'Permanência já finalizada' }, { status: 409 });
-    if (message.includes('cash_session_required')) return NextResponse.json({ error: 'Abra o caixa antes de receber pagamento em dinheiro.' }, { status: 409 });
+    if (message.includes('stay_not_open'))
+      return NextResponse.json({ error: 'Permanência já finalizada' }, { status: 409 });
+    if (message.includes('cash_session_required'))
+      return NextResponse.json(
+        { error: 'Abra o caixa antes de receber pagamento em dinheiro.' },
+        { status: 409 },
+      );
     return NextResponse.json({ error: 'Não foi possível finalizar a permanência.' }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true, result, ...totals });
+  const serverAmount = Number((result as { amount?: number } | null)?.amount ?? totals.amount);
+  return NextResponse.json({ ok: true, result, ...totals, amount: serverAmount });
 }

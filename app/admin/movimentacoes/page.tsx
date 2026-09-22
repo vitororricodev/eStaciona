@@ -1,2 +1,59 @@
-'use client';import { useEffect,useState } from 'react';import { AppShell } from '@/components/AppShell';import { AdminNav } from '@/components/AdminNav';
-export default function Page(){const [d,setD]=useState<any>(null);useEffect(()=>{fetch('/api/reports?days=30').then(r=>r.json()).then(setD)},[]);return <AppShell title="Gestão"><AdminNav/><h1 className="text-3xl font-black">Movimentações</h1><p className="mt-2 text-slate-500">Últimos registros de entrada, saída e cancelamento.</p><div className="mt-6 overflow-hidden rounded-3xl bg-white shadow-sm"><div className="overflow-x-auto"><table className="w-full min-w-[760px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase text-slate-400"><tr><th className="p-4">Placa</th><th>Cliente</th><th>Entrada</th><th>Saída</th><th>Status</th><th>Valor</th></tr></thead><tbody>{(d?.movements||[]).map((x:any)=>{const v=Array.isArray(x.vehicles)?x.vehicles[0]:x.vehicles;const c=Array.isArray(v?.customers)?v.customers[0]:v?.customers;return <tr key={x.id} className="border-t border-slate-100"><td className="p-4 font-black">{v?.plate||'-'}</td><td>{c?.name||'-'}</td><td>{new Date(x.started_at).toLocaleString('pt-BR')}</td><td>{x.ended_at?new Date(x.ended_at).toLocaleString('pt-BR'):'-'}</td><td><span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">{x.status}</span></td><td className="font-bold">{x.final_amount!=null?`R$ ${Number(x.final_amount).toFixed(2).replace('.',',')}`:'-'}</td></tr>})}</tbody></table></div></div></AppShell>}
+'use client';
+import { useEffect, useState } from 'react';
+import { AppShell } from '@/components/AppShell';
+import { AdminNav } from '@/components/AdminNav';
+export default function Page() {
+  const [d, setD] = useState<any>(null);
+  useEffect(() => {
+    fetch('/api/reports?days=30')
+      .then((r) => r.json())
+      .then(setD);
+  }, []);
+  return (
+    <AppShell title="Gestão">
+      <AdminNav />
+      <h1 className="text-3xl font-black">Movimentações</h1>
+      <p className="mt-2 text-slate-500">Últimos registros de entrada, saída e cancelamento.</p>
+      <div className="mt-6 overflow-hidden rounded-3xl bg-white shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[760px] text-left text-sm">
+            <thead className="bg-slate-50 text-xs uppercase text-slate-400">
+              <tr>
+                <th className="p-4">Placa</th>
+                <th>Cliente</th>
+                <th>Entrada</th>
+                <th>Saída</th>
+                <th>Status</th>
+                <th>Valor</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(d?.movements || []).map((x: any) => {
+                const v = Array.isArray(x.vehicles) ? x.vehicles[0] : x.vehicles;
+                const c = Array.isArray(v?.customers) ? v.customers[0] : v?.customers;
+                return (
+                  <tr key={x.id} className="border-t border-slate-100">
+                    <td className="p-4 font-black">{v?.plate || '-'}</td>
+                    <td>{c?.name || '-'}</td>
+                    <td>{new Date(x.started_at).toLocaleString('pt-BR')}</td>
+                    <td>{x.ended_at ? new Date(x.ended_at).toLocaleString('pt-BR') : '-'}</td>
+                    <td>
+                      <span className="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">
+                        {x.status}
+                      </span>
+                    </td>
+                    <td className="font-bold">
+                      {x.final_amount != null
+                        ? `R$ ${Number(x.final_amount).toFixed(2).replace('.', ',')}`
+                        : '-'}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </AppShell>
+  );
+}

@@ -1,2 +1,64 @@
-'use client';import { FormEvent,useState } from 'react';import { AppShell } from '@/components/AppShell';import { AdminNav } from '@/components/AdminNav';import { Search } from 'lucide-react';
-export default function Page(){const [q,setQ]=useState('');const [rows,setRows]=useState<any[]>([]);const [loaded,setLoaded]=useState(false);async function load(term=''){const d=await fetch(`/api/customers?q=${encodeURIComponent(term)}`).then(r=>r.json());setRows(d.customers||[]);setLoaded(true)}function submit(e:FormEvent){e.preventDefault();load(q)}return <AppShell title="Gestão"><AdminNav/><h1 className="text-3xl font-black">Clientes e veículos</h1><p className="mt-2 text-slate-500">Base recorrente e histórico de utilização.</p><form onSubmit={submit} className="mt-6 flex gap-2"><input value={q} onChange={e=>setQ(e.target.value)} placeholder="Nome ou telefone" className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-brand-500"/><button className="rounded-2xl bg-brand-600 px-5 text-white"><Search/></button></form>{!loaded?<button onClick={()=>load()} className="mt-4 text-sm font-bold text-brand-700">Carregar clientes</button>:<div className="mt-6 grid gap-4 md:grid-cols-2">{rows.map(c=><div key={c.id} className="rounded-3xl bg-white p-5 shadow-sm"><h2 className="text-xl font-black">{c.name}</h2><p className="text-sm text-slate-500">{c.phone}</p><div className="mt-4 space-y-2">{(c.vehicles||[]).map((v:any)=><div key={v.id} className="rounded-2xl bg-slate-50 p-3"><div className="flex justify-between"><strong>{v.plate}</strong><span className="text-xs text-slate-400">{(v.stays||[]).length} visitas</span></div><p className="text-sm text-slate-500">{[v.make,v.model,v.color].filter(Boolean).join(' • ')}</p></div>)}</div></div>)}</div>}</AppShell>}
+'use client';
+import { FormEvent, useState } from 'react';
+import { AppShell } from '@/components/AppShell';
+import { AdminNav } from '@/components/AdminNav';
+import { Search } from 'lucide-react';
+export default function Page() {
+  const [q, setQ] = useState('');
+  const [rows, setRows] = useState<any[]>([]);
+  const [loaded, setLoaded] = useState(false);
+  async function load(term = '') {
+    const d = await fetch(`/api/customers?q=${encodeURIComponent(term)}`).then((r) => r.json());
+    setRows(d.customers || []);
+    setLoaded(true);
+  }
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    load(q);
+  }
+  return (
+    <AppShell title="Gestão">
+      <AdminNav />
+      <h1 className="text-3xl font-black">Clientes e veículos</h1>
+      <p className="mt-2 text-slate-500">Base recorrente e histórico de utilização.</p>
+      <form onSubmit={submit} className="mt-6 flex gap-2">
+        <input
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Nome ou telefone"
+          className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-brand-500"
+        />
+        <button className="rounded-2xl bg-brand-600 px-5 text-white">
+          <Search />
+        </button>
+      </form>
+      {!loaded ? (
+        <button onClick={() => load()} className="mt-4 text-sm font-bold text-brand-700">
+          Carregar clientes
+        </button>
+      ) : (
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          {rows.map((c) => (
+            <div key={c.id} className="rounded-3xl bg-white p-5 shadow-sm">
+              <h2 className="text-xl font-black">{c.name}</h2>
+              <p className="text-sm text-slate-500">{c.phone}</p>
+              <div className="mt-4 space-y-2">
+                {(c.vehicles || []).map((v: any) => (
+                  <div key={v.id} className="rounded-2xl bg-slate-50 p-3">
+                    <div className="flex justify-between">
+                      <strong>{v.plate}</strong>
+                      <span className="text-xs text-slate-400">{(v.stays || []).length} visitas</span>
+                    </div>
+                    <p className="text-sm text-slate-500">
+                      {[v.make, v.model, v.color].filter(Boolean).join(' • ')}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </AppShell>
+  );
+}

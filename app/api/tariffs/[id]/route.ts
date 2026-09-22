@@ -28,7 +28,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!parsed.success) return NextResponse.json({ error: 'Dados inválidos.' }, { status: 400 });
 
   const { supabase, user, profile } = await getContext();
-  if (!profile || !['owner', 'manager'].includes(profile.role)) return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 });
+  if (!profile || !['owner', 'manager'].includes(profile.role))
+    return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 });
 
   const input: any = { ...parsed.data, updated_at: new Date().toISOString() };
   if (input.daily_max === '') input.daily_max = null;
@@ -40,11 +41,13 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       .eq('organization_id', profile.organization_id)
       .eq('is_default', true)
       .neq('id', id);
-    if (unset.error) return NextResponse.json({ error: unset.error.message }, { status: 500 });
+    if (unset.error)
+      return NextResponse.json({ error: 'Não foi possível atualizar a tarifa padrão.' }, { status: 500 });
   }
 
   if (input.additional_fraction_price != null && input.fraction_minutes != null) {
-    input.additional_hour_price = Number(input.additional_fraction_price) * (60 / Number(input.fraction_minutes));
+    input.additional_hour_price =
+      Number(input.additional_fraction_price) * (60 / Number(input.fraction_minutes));
   }
 
   const { data, error } = await supabase
@@ -55,7 +58,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Não foi possível atualizar a tarifa.' }, { status: 500 });
 
   await supabase.from('audit_logs').insert({
     organization_id: profile.organization_id,
@@ -72,7 +75,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, profile } = await getContext();
-  if (!profile || !['owner', 'manager'].includes(profile.role)) return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 });
+  if (!profile || !['owner', 'manager'].includes(profile.role))
+    return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 });
 
   const { data: tariff, error: fetchError } = await supabase
     .from('tariff_plans')
@@ -82,7 +86,8 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
     .single();
 
   if (fetchError || !tariff) return NextResponse.json({ error: 'Tarifa não encontrada.' }, { status: 404 });
-  if (tariff.is_default) return NextResponse.json({ error: 'A tarifa padrão não pode ser desativada.' }, { status: 409 });
+  if (tariff.is_default)
+    return NextResponse.json({ error: 'A tarifa padrão não pode ser desativada.' }, { status: 409 });
 
   const { error } = await supabase
     .from('tariff_plans')
@@ -90,6 +95,6 @@ export async function DELETE(_: NextRequest, { params }: { params: Promise<{ id:
     .eq('id', id)
     .eq('organization_id', profile.organization_id);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: 'Não foi possível desativar a tarifa.' }, { status: 500 });
   return NextResponse.json({ ok: true });
 }
