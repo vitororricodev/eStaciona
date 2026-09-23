@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getContext } from '@/lib/authz';
+import { getSessionContext } from '@/lib/authz';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { passwordChangeSchema } from '@/lib/passwordPolicy';
 import { completeRequiredPasswordChange } from '@/lib/passwordChange';
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   if (!parsed.success)
     return NextResponse.json({ error: 'A nova senha precisa ter entre 8 e 72 caracteres.' }, { status: 400 });
 
-  const { supabase, user, profile } = await getContext();
+  const { supabase, user, profile } = await getSessionContext();
   const admin = createAdminClient();
   const result = await completeRequiredPasswordChange(
     { userId: user?.id || null, profile },

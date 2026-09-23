@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { enforceRateLimit } from '@/lib/rateLimit';
 import { isValidBrazilianPlate, normalizePlate } from '@/lib/plate';
+import { getOrganizationLicense } from '@/lib/license';
 
 function digits(value: unknown) {
   return String(value || '').replace(/\D/g, '');
@@ -33,18 +34,24 @@ export async function POST(req: NextRequest) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('stays')
-    .select('public_token,vehicles!inner(plate,customers!inner(phone))')
+    .select('public_token,organization_id,vehicles!inner(plate,customers!inner(phone))')
     .eq('status', 'open')
     .eq('vehicles.plate', plate)
     .limit(20);
 
   if (error) return NextResponse.json({ error: 'Não foi possível consultar.' }, { status: 500 });
 
-  const matches = (data || []).filter((stay: any) => {
+  const phoneMatches = (data || []).filter((stay: any) => {
     const vehicle = Array.isArray(stay.vehicles) ? stay.vehicles[0] : stay.vehicles;
     const customer = Array.isArray(vehicle?.customers) ? vehicle.customers[0] : vehicle?.customers;
     return samePhone(customer?.phone || '', phone);
   });
+
+  const matches = [];
+  for (const stay of phoneMatches) {
+    const license = await getOrganizationLicense(supabase, stay.organization_id);
+    if (license.active) matches.push(stay);
+  }
 
   if (matches.length !== 1) return NextResponse.json({ found: false });
   return NextResponse.json({ found: true, token: matches[0].public_token });

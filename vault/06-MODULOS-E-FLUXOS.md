@@ -14,6 +14,14 @@
 - Equipe, clientes, tarifas, serviços e auditoria protegidos por papéis.
 - Administração de plataforma e provisionamento de organização usam autorização explícita e operação atômica.
 
+## Master SaaS
+
+- `/master` apresenta indicadores de organizações ativas, bloqueadas, expiradas e pendentes.
+- `/master/clientes` cadastra estacionamentos com plano inicial e controla licença.
+- `/master/planos` mantém duração, preço e disponibilidade dos planos.
+- `/master/auditoria` apresenta ações administrativas da plataforma.
+- Bloqueio e liberação são persistidos atomicamente e propagados às sessões abertas.
+
 ## Conta
 
 - Login via Supabase.

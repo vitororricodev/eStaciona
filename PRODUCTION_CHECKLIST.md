@@ -1,9 +1,13 @@
-# Checklist de produção — eStaciona 1.0.12 (candidato)
+# Checklist de produção — eStaciona 1.1.0
 
 ## Obrigatório
 
 - [ ] Criar projeto Supabase de produção.
-- [ ] Executar migrations 001 a 008, em ordem, e comparar com o schema implantado.
+- [ ] Executar migrations 001 a 009, em ordem, e comparar com o schema implantado.
+- [ ] Confirmar Vitor e Levi por UUID em `PLATFORM_ADMIN_USER_IDS`.
+- [ ] Conferir preços dos planos; a migration cria os três planos com preço inicial zero.
+- [ ] Validar bloqueio/liberação em duas sessões reais e confirmar evento Realtime.
+- [ ] Revisar as licenças iniciais de 30 dias criadas para organizações existentes.
 - [ ] Criar usuário proprietário e bootstrap da organização.
 - [ ] Configurar `NEXT_PUBLIC_SUPABASE_URL`.
 - [ ] Configurar `NEXT_PUBLIC_SUPABASE_ANON_KEY`.

@@ -30,7 +30,24 @@ export default function LoginPage() {
       .select('must_change_password')
       .eq('id', data.user.id)
       .maybeSingle();
-    router.push(profile?.must_change_password ? '/alterar-senha' : '/operacao');
+
+    const platformResponse = await fetch('/api/platform/me', { cache: 'no-store' });
+    const platformData = await platformResponse.json().catch(() => ({}));
+    if (platformResponse.ok && platformData.platformAdmin) {
+      router.push('/master');
+      router.refresh();
+      return;
+    }
+
+    const licenseResponse = await fetch('/api/license/me', { cache: 'no-store' });
+    const license = await licenseResponse.json().catch(() => ({}));
+    router.push(
+      profile?.must_change_password
+        ? '/alterar-senha'
+        : licenseResponse.ok && !license.active
+          ? '/licenca-bloqueada'
+          : '/operacao',
+    );
     router.refresh();
   }
   return (

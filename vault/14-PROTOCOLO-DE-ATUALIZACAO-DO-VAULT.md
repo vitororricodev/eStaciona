@@ -16,7 +16,7 @@ Este protocolo é obrigatório para qualquer pessoa ou IA que altere o eStaciona
 - Não enfraquecer invariantes para “fazer funcionar”.
 - Criar migration incremental para schema; nunca reescrever histórico já aplicado.
 - Adicionar/ajustar testes.
-- Manter a versão na série vigente; no estado atual, `1.0.12`.
+- Manter a versão na série vigente; no estado atual, `1.1.0`.
 - Distinguir fatos confirmados, histórico e pendências.
 
 ## Depois da mudança

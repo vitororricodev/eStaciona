@@ -1,6 +1,6 @@
 # Segurança, autenticação e acesso
 
-## Controles confirmados no candidato 1.0.12
+## Controles confirmados na versão 1.1.0
 
 - Autenticação Supabase validada no servidor.
 - Autorização por papel centralizada em `lib/permissions.ts` e aplicada nas rotas.
@@ -13,6 +13,10 @@
 - Consulta por placa exige confirmação do WhatsApp completo.
 - Troca obrigatória de senha é finalizada server-side.
 - Provisionamento de organização é atômico.
+- Masters são validados server-side por UUID/configuração e `platform_users`.
+- Licença é validada por middleware, APIs, RLS e RPCs.
+- Vitor e Levi são isentos porque administram a plataforma, não porque possuem licença especial.
+- Supabase Realtime bloqueia/libera telas abertas; polling de contingência evita depender apenas do canal.
 
 ## Matriz resumida
 

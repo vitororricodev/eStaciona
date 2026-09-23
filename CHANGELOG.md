@@ -1,3 +1,14 @@
+# 1.1.0 — versão final
+
+- Painel Master SaaS em `/master` para clientes, planos, licenças e auditoria.
+- Planos mensal (30 dias), semestral (180 dias) e anual (365 dias), com preço configurável.
+- Licenças separadas de usuários, com snapshots comerciais e validade calculada no servidor.
+- Liberação, renovação, troca de plano, bloqueio e cancelamento por RPC transacional.
+- Bloqueio imediato em RLS/APIs e atualização de sessões abertas via Supabase Realtime, com polling de contingência.
+- Vitor e Levi permanecem sem validade por serem administradores da plataforma identificados por UUID.
+- Migration `009_saas_licensing_and_master_panel.sql`, testes e Vault atualizados.
+- Organizações existentes recebem licença mensal inicial de 30 dias para evitar interrupção durante o rollout.
+
 # 1.0.12 — não publicado
 
 - Troca obrigatória de senha executada e auditada no servidor, sem endpoint de liberação isolada.

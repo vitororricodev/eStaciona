@@ -19,3 +19,10 @@
 ## Validação pendente
 
 O build e a análise estática foram executados, mas ainda é necessário validar câmera/QR, teclado, safe area e navegação em Android e iPhone reais, além de revisão de acessibilidade assistiva.
+
+## Painel Master 1.1.0
+
+- Navegação própria e separada da gestão do estacionamento.
+- Listas pesquisáveis, filtros de situação e ações com feedback.
+- Bloqueio em overlay sem recarregar a página.
+- Ações sensíveis exigem motivo e registram auditoria.

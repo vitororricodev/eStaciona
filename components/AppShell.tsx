@@ -5,12 +5,14 @@ import { BackButton } from '@/components/BackButton';
 import { BrandLogo } from '@/components/BrandLogo';
 import { LogoutButton } from '@/components/LogoutButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LicenseGuard } from '@/components/LicenseGuard';
 
-const roots = new Set(['/admin', '/operacao']);
+const roots = new Set(['/admin', '/operacao', '/master']);
 
 function fallbackFor(pathname: string) {
   if (pathname.startsWith('/admin/')) return '/admin';
   if (pathname.startsWith('/operacao/')) return '/operacao';
+  if (pathname.startsWith('/master/')) return '/master';
   if (pathname.startsWith('/cliente/')) return '/consultar';
   return '/';
 }
@@ -30,6 +32,7 @@ export function AppShell({
     (pathname.startsWith('/admin/') || pathname.startsWith('/operacao/') || pathname.startsWith('/cliente/'));
   return (
     <main className="min-h-screen bg-slate-50 pb-[max(1.5rem,env(safe-area-inset-bottom))] dark:bg-slate-950 dark:text-slate-100">
+      <LicenseGuard />
       <header className="sticky top-0 z-20 border-b border-slate-200/70 bg-white/90 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90">
         <div className="mx-auto flex max-w-6xl min-w-0 items-center justify-between gap-2 px-3 py-3 sm:px-6">
           <div className="min-w-0 flex-1 sm:flex-none">

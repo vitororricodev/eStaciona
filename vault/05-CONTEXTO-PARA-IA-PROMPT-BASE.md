@@ -18,6 +18,10 @@ Antes de alterar o eStaciona:
 - Preservar auditoria para alterações sensíveis.
 - Nunca expor `service_role`, telefone, CPF ou dados administrativos.
 - Consulta pública por placa exige WhatsApp completo.
+- Não confundir usuário inativo com licença de organização.
+- Masters da plataforma não dependem de licença de estacionamento.
+- Toda rota operacional nova deve respeitar a licença no servidor e no banco.
+- Alterações de licença exigem atomicidade, auditoria e propagação em tempo real.
 - Atualizar testes, changelog e Vault junto com a mudança.
 - Todo pacote entregue deve conter a pasta `vault/`.
 - Não afirmar deploy, migração real ou teste móvel sem evidência.

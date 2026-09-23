@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { getContext } from '@/lib/authz';
-import { isPlatformAdmin } from '@/lib/platformAdmin';
+import { ensureConfiguredPlatformAdmin, isPlatformAdminUser } from '@/lib/platformAdmin';
 
 export async function GET() {
   const { user } = await getContext();
-  const platformAdmin = isPlatformAdmin(user?.id);
+  await ensureConfiguredPlatformAdmin(user?.id);
+  const platformAdmin = await isPlatformAdminUser(user?.id);
 
   return NextResponse.json({
     platformAdmin,

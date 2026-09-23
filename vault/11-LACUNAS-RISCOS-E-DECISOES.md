@@ -15,19 +15,26 @@
 
 ## Riscos ainda abertos
 
-| Risco                                  | Ação necessária                                    |
-| -------------------------------------- | -------------------------------------------------- |
-| Drift entre migrations e banco real    | Comparar e aplicar 001–008 em homologação          |
-| RLS multiempresa não testada ao vivo   | Testar dois tenants e todos os papéis              |
-| Concorrência real não exercitada       | Testar RPCs no PostgreSQL sob disputa              |
-| Mobile/QR não validado em dispositivos | Testar Android e iPhone reais                      |
-| Observabilidade e alertas              | Definir métricas, logs, retenção e alertas         |
-| LGPD/retenção                          | Formalizar prazos, base legal e descarte           |
-| Rate limit operacional                 | Definir limpeza, rotação de segredo e capacidade   |
-| Deploy                                 | Validar Vercel, variáveis, health check e rollback |
+| Risco                                  | Ação necessária                                         |
+| -------------------------------------- | ------------------------------------------------------- |
+| Drift entre migrations e banco real    | Comparar e aplicar 001–009 em homologação               |
+| RLS multiempresa não testada ao vivo   | Testar dois tenants e todos os papéis                   |
+| Concorrência real não exercitada       | Testar RPCs no PostgreSQL sob disputa                   |
+| Mobile/QR não validado em dispositivos | Testar Android e iPhone reais                           |
+| Observabilidade e alertas              | Definir métricas, logs, retenção e alertas              |
+| LGPD/retenção                          | Formalizar prazos, base legal e descarte                |
+| Rate limit operacional                 | Definir limpeza, rotação de segredo e capacidade        |
+| Deploy                                 | Validar Vercel, variáveis, health check e rollback      |
+| Licenciamento 1.1.0                    | Validar migration 009, bloqueio e liberação reais       |
+| Realtime                               | Validar publicação, RLS e reconexão em duas sessões     |
+| Rollout de licenças                    | Revisar os 30 dias concedidos a organizações existentes |
+| Preços                                 | Configurar valores comerciais antes da venda            |
 
 ## Decisões vigentes
 
-- A série continua em `1.0.12`; não há quebra que justifique `1.1.0`.
+- A 1.0.12 encerra o ciclo de hardening; o novo módulo SaaS justifica a versão minor `1.1.0`.
+- Licença controla organização e nunca substitui `profiles.active`.
+- Vitor e Levi são masters globais e não possuem vencimento.
+- Bloqueio comercial não apaga dados nem usuários.
 - Vault é documentação viva versionada dentro do projeto.
 - “Aprovado localmente” não significa “implantado” ou “validado em produção”.

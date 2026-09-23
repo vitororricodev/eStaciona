@@ -94,10 +94,10 @@ export default function AdminPage() {
         ))}
         {platformAdmin && (
           <DashboardCard
-            href="/admin/estacionamentos"
+            href="/master"
             icon={<Building2 />}
-            title="Cadastrar estacionamento"
-            text="Crie uma empresa e o primeiro acesso do proprietário."
+            title="Painel Master"
+            text="Gerencie clientes SaaS, planos, licenças e auditoria da plataforma."
           />
         )}
       </div>

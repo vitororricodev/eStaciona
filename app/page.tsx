@@ -3,7 +3,7 @@ import { ArrowRight, CarFront, Gauge, QrCode, Smartphone } from 'lucide-react';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { createClient } from '@/lib/supabase/server';
-import { isPlatformAdmin } from '@/lib/platformAdmin';
+import { isPlatformAdminUser } from '@/lib/platformAdmin';
 
 export default async function Home() {
   const supabase = await createClient();
@@ -23,9 +23,9 @@ export default async function Home() {
     userRole = profile?.active ? profile.role : null;
   }
 
-  const platformAdmin = isPlatformAdmin(user?.id);
+  const platformAdmin = await isPlatformAdminUser(user?.id);
   const canAccessManagement = userRole === 'owner' || userRole === 'manager' || platformAdmin;
-  const managementHref = platformAdmin && !userRole ? '/admin/estacionamentos' : '/admin';
+  const managementHref = platformAdmin && !userRole ? '/master' : '/admin';
 
   const primaryHref = user
     ? mustChangePassword
@@ -88,7 +88,7 @@ export default async function Home() {
               {user ? (
                 <>
                   <Link
-                    href={mustChangePassword ? '/alterar-senha' : '/operacao'}
+                    href={primaryHref}
                     className="group inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-brand-700 to-brand-500 px-5 py-3.5 font-black text-white shadow-[0_14px_35px_rgba(24,119,248,0.28)] transition duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(24,119,248,0.34)]"
                   >
                     {mustChangePassword

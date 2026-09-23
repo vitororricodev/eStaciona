@@ -1,8 +1,7 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getContext } from '@/lib/authz';
-import { isPlatformAdmin } from '@/lib/platformAdmin';
+import { requirePlatformAdmin } from '@/lib/platformAuth';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 const schema = z.object({
@@ -10,6 +9,7 @@ const schema = z.object({
   ownerName: z.string().min(2).max(80),
   email: z.string().email(),
   temporaryPassword: z.string().min(8).max(72),
+  planId: z.string().uuid(),
 });
 
 function slugify(value: string) {
@@ -24,12 +24,6 @@ function slugify(value: string) {
   );
 }
 
-async function requirePlatformAdmin() {
-  const context = await getContext();
-  if (!context.user || !isPlatformAdmin(context.user.id)) return null;
-  return context;
-}
-
 export async function GET() {
   const context = await requirePlatformAdmin();
   if (!context) return NextResponse.json({ error: 'Sem permissão.' }, { status: 403 });
@@ -37,7 +31,9 @@ export async function GET() {
   const admin = createAdminClient();
   const { data: organizations, error } = await admin
     .from('organizations')
-    .select('id,name,slug,created_at')
+    .select(
+      'id,name,slug,created_at,organization_licenses(plan_id,status,starts_at,expires_at,blocked_at,block_reason,plan_snapshot)',
+    )
     .order('created_at', { ascending: false });
 
   if (error)
@@ -89,14 +85,19 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data: organization, error: provisionError } = await admin.rpc('provision_organization_atomic', {
-    p_owner_user_id: authData.user.id,
-    p_organization_name: parsed.data.organizationName,
-    p_slug: slug,
-    p_owner_name: parsed.data.ownerName,
-  });
+  const { data: provisioned, error: provisionError } = await admin.rpc(
+    'provision_organization_with_license_atomic',
+    {
+      p_owner_user_id: authData.user.id,
+      p_organization_name: parsed.data.organizationName,
+      p_slug: slug,
+      p_owner_name: parsed.data.ownerName,
+      p_plan_id: parsed.data.planId,
+      p_actor_user_id: context.user.id,
+    },
+  );
 
-  if (provisionError || !organization) {
+  if (provisionError || !provisioned) {
     const { error: compensationError } = await admin.auth.admin.deleteUser(authData.user.id);
     return NextResponse.json(
       {
@@ -111,7 +112,8 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(
     {
       ok: true,
-      organization,
+      organization: provisioned.organization,
+      license: provisioned.license,
       owner: { id: authData.user.id, email: parsed.data.email, mustChangePassword: true },
     },
     { status: 201 },

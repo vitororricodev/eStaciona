@@ -1,8 +1,8 @@
-# Auditoria do código — candidato 1.0.12
+# Auditoria do código — versão 1.1.0
 
 ## Resultado
 
-A auditoria estática e a validação local confirmam que as correções prioritárias identificadas na 1.0.11 foram incorporadas ao candidato 1.0.12.
+A auditoria estática confirma a manutenção das correções da 1.0.12 e a implementação do módulo SaaS da 1.1.0.
 
 | Achado anterior                    | Situação no código                                     |
 | ---------------------------------- | ------------------------------------------------------ |
@@ -13,7 +13,10 @@ A auditoria estática e a validação local confirmam que as correções priorit
 | Bypass por service role            | Corrigido com autorização explícita                    |
 | RLS/isolamento frágeis             | Endurecidos pela migration 008                         |
 | Senha marcada no cliente           | Corrigido por conclusão server-side                    |
-| Versões divergentes                | Centralizadas e corrigidas para 1.0.12                 |
+| Versões divergentes                | Centralizadas e atualizadas para 1.1.0                 |
+| Licença apenas na interface        | Corrigido com middleware, APIs, RLS e RPC              |
+| Sessão aberta após bloqueio        | Corrigido com Realtime e polling de contingência       |
+| Plano alterando contrato anterior  | Corrigido com snapshot na licença                      |
 | Sem lockfile/testes/CI             | Corrigido                                              |
 | UX administrativa móvel incompleta | Melhorada; validação física ainda pendente             |
 
@@ -22,11 +25,13 @@ A auditoria estática e a validação local confirmam que as correções priorit
 - ESLint sem warnings.
 - Prettier aprovado em todos os arquivos correspondentes.
 - TypeScript aprovado.
-- 17 testes unitários aprovados.
-- 2 testes de contrato das migrations aprovados.
+- 22 testes unitários aprovados.
+- 4 testes de contrato das migrations aprovados.
+- Build Next.js aprovado com 55 páginas/rotas.
+- Auditoria de produção aprovada com 0 vulnerabilidades.
 - Build Next.js de produção aprovado.
 - Auditoria de dependências de produção sem vulnerabilidades conhecidas no momento da execução.
 
 ## Limites
 
-Não foram executados nesta auditoria: migrations em Supabase real, concorrência real, RLS com dois tenants, navegação/câmera em dispositivos reais, deploy Vercel ou commit/push. Esses itens permanecem em [[11-LACUNAS-RISCOS-E-DECISOES]].
+Não foram executados nesta auditoria: migration 009 em Supabase real, Realtime com duas sessões, RLS com dois tenants, navegação/câmera em dispositivos reais, deploy Vercel ou commit/push. Esses itens permanecem em [[11-LACUNAS-RISCOS-E-DECISOES]].

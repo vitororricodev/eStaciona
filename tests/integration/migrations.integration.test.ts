@@ -22,4 +22,22 @@ describe('security migration contracts', () => {
     expect(sql).toContain('to service_role');
     expect(sql).toContain('organization_id = public.current_org_id()');
   });
+
+  it('mantém licenças, planos e auditoria separados dos perfis de usuário', () => {
+    const sql = migration('009_saas_licensing_and_master_panel.sql');
+    expect(sql).toContain('create table if not exists public.saas_plans');
+    expect(sql).toContain('create table if not exists public.organization_licenses');
+    expect(sql).toContain('create table if not exists public.license_events');
+    expect(sql).toContain('create table if not exists public.platform_audit_logs');
+  });
+
+  it('bloqueia o tenant no banco e altera licenças atomicamente', () => {
+    const sql = migration('009_saas_licensing_and_master_panel.sql');
+    expect(sql).toContain('organization_has_active_license');
+    expect(sql).toContain('manage_organization_license_atomic');
+    expect(sql).toContain("when 'block' then");
+    expect(sql).toContain('for update');
+    expect(sql).toContain('supabase_realtime');
+    expect(sql).toContain('to service_role');
+  });
 });

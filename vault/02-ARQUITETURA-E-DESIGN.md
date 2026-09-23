@@ -29,5 +29,9 @@ A versão instalada exata é determinada pelo lockfile, não apenas pelos interv
 - `stays.tariff_snapshot` preserva a regra tarifária da entrada.
 - Rotas públicas usam rate limiting persistente por hash.
 - `lib/version.ts` centraliza a versão exibida pela aplicação.
+- `profiles.active` controla usuário; `organization_licenses` controla o acesso comercial da organização.
+- `current_org_id()` só libera o tenant quando a licença está válida.
+- O painel `/master` e suas APIs validam o master no servidor.
+- Mudanças de licença usam RPC atômica, auditoria, Supabase Realtime e polling de contingência.
 
 Consulte [[03-ESTRUTURA-DE-DADOS-E-API]] e [[07-SEGURANCA-AUTENTICACAO-E-ACESSO]].

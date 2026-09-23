@@ -10,12 +10,16 @@ Consulte `.env.example`. Segredos administrativos e `RATE_LIMIT_SECRET` são ser
 
 ## Banco
 
-Aplicar migrations 001–008 em ordem, primeiro em homologação. Comparar o schema implantado com o repositório, testar rollback operacional e confirmar as RPCs/políticas antes do deploy da aplicação.
+Aplicar migrations 001–009 em ordem, primeiro em homologação. Comparar o schema implantado com o repositório, testar rollback operacional e confirmar as RPCs/políticas antes do deploy da aplicação.
 
 ## Checklist mínimo
 
 - [ ] Variáveis configuradas no ambiente correto.
-- [ ] Migrations 001–008 aplicadas e verificadas em homologação.
+- [ ] Migrations 001–009 aplicadas e verificadas em homologação.
+- [ ] Vitor e Levi configurados por UUID em `PLATFORM_ADMIN_USER_IDS`.
+- [ ] Preços dos planos revisados; a migration 009 começa com valor zero.
+- [ ] Licenças iniciais das organizações existentes revisadas.
+- [ ] Bloqueio/liberação e Realtime testados em duas sessões reais.
 - [ ] RLS testada com ao menos dois tenants reais.
 - [ ] Concorrência das RPCs críticas testada no PostgreSQL.
 - [ ] `npm ci && npm run verify` aprovado.
@@ -26,4 +30,4 @@ Aplicar migrations 001–008 em ordem, primeiro em homologação. Comparar o sch
 
 ## Estado atual
 
-O candidato 1.0.12 foi validado localmente. Não há evidência neste pacote de migrations aplicadas, deploy Vercel ou testes em dispositivos reais.
+A versão 1.1.0 foi implementada localmente. A migration 009, o RLS de licença, o Realtime, o deploy Vercel e os testes em dispositivos reais precisam de validação no ambiente de destino.

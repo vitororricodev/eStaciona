@@ -1,4 +1,4 @@
-# Arquitetura — eStaciona 1.0.12 (candidato não publicado)
+# Arquitetura — eStaciona 1.1.0
 
 ## 1. Fluxos
 
@@ -76,3 +76,9 @@ Ponto de extensão deliberadamente sem provedor fixo. O núcleo suporta PIX como
 `GitHub → Vercel (Next.js) → Supabase (Auth + PostgreSQL + RLS)`
 
 Não expor `SUPABASE_SERVICE_ROLE_KEY` ao browser.
+
+## 8. Licenciamento SaaS
+
+O licenciamento pertence à organização e permanece separado de `profiles.active`. `current_profile_org_id()` identifica o tenant autenticado, enquanto `current_org_id()` somente libera dados operacionais quando a licença está ativa e dentro da validade.
+
+O painel `/master` é exclusivo dos UUIDs configurados em `PLATFORM_ADMIN_USER_IDS` ou registrados em `platform_users`. Alterações de licença usam a RPC `manage_organization_license_atomic`, geram auditoria e são propagadas por Supabase Realtime. APIs, RLS e interface validam a licença em camadas.

@@ -1,4 +1,4 @@
-# Deploy na Vercel — eStaciona 1.0.12 (candidato)
+# Deploy na Vercel — eStaciona 1.1.0
 
 ## Variáveis obrigatórias
 
@@ -26,6 +26,7 @@ Execute no Supabase, nesta ordem:
 6. `supabase/migrations/006_stay_customer_flags.sql`
 7. `supabase/migrations/007_atomic_operations_and_tariff_snapshot.sql`
 8. `supabase/migrations/008_security_rls_rate_limit_and_provisioning.sql`
+9. `supabase/migrations/009_saas_licensing_and_master_panel.sql`
 
 ## Build
 

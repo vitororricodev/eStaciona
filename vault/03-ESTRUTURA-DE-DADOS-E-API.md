@@ -12,13 +12,18 @@ Aplicar em ordem, primeiro em homologação:
 6. `006_stay_customer_flags.sql`
 7. `007_atomic_operations_and_tariff_snapshot.sql`
 8. `008_security_rls_rate_limit_and_provisioning.sql`
+9. `009_saas_licensing_and_master_panel.sql`
 
-As migrations 007 e 008 são parte obrigatória da versão 1.0.12. O schema implantado não foi consultado nesta revisão e pode ter drift.
+As migrations 007–009 são obrigatórias para a versão 1.1.0. O schema implantado deve ser comparado antes do rollout.
 
 ## Estruturas novas/relevantes
 
 - `stays.tariff_snapshot`: JSON validado e imutável após definido.
 - `api_rate_limits`: contadores persistentes das rotas públicas, com RLS.
+- `platform_users`: masters persistidos; `PLATFORM_ADMIN_USER_IDS` continua como bootstrap/emergência.
+- `saas_plans`: catálogo comercial com duração e preço configuráveis.
+- `organization_licenses`: estado, validade, bloqueio e snapshot do plano por organização.
+- `license_events` e `platform_audit_logs`: rastreabilidade imutável da plataforma.
 - Perfis, organizações, veículos, tarifas, permanências, serviços, caixa, movimentos e auditoria permanecem segregados por organização.
 
 ## RPCs críticas
@@ -29,6 +34,9 @@ As migrations 007 e 008 são parte obrigatória da versão 1.0.12. O schema impl
 - `provision_organization_atomic`: provisiona organização sem estado parcial.
 - `complete_password_change`: conclui a troca obrigatória com validação do usuário.
 - `consume_rate_limit`: aplica janela/limite de forma persistente.
+- `provision_organization_with_license_atomic`: cria organização e licença inicial na mesma transação.
+- `manage_organization_license_atomic`: bloqueia, libera, renova ou troca plano com auditoria.
+- `organization_license_status`: calcula expiração usando o horário do servidor.
 
 ## Contratos de API
 

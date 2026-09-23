@@ -2,7 +2,7 @@
 
 ## Estado de referência
 
-Este Vault faz parte do próprio projeto e descreve o candidato **1.0.12**, ainda não publicado. Ele deve ser consultado antes de qualquer alteração e atualizado no mesmo pacote depois de toda mudança relevante.
+Este Vault faz parte do próprio projeto e descreve a versão final **1.1.0**. Ele deve ser consultado antes de qualquer alteração e atualizado no mesmo pacote depois de toda mudança relevante.
 
 Fontes de verdade, em ordem: código e migrations versionados; testes executados; documentação deste Vault; documentos históricos. O estado real de Supabase/Vercel só é confirmado após verificação nesses ambientes.
 
@@ -33,4 +33,4 @@ Fontes de verdade, em ordem: código e migrations versionados; testes executados
 
 ## Situação da validação
 
-A versão 1.0.12 passou localmente por lint, typecheck, testes unitários, testes de contrato das migrations e build de produção. Não houve aplicação das migrations em Supabase real, teste RLS com dois tenants reais, teste móvel em dispositivos reais ou deploy. Consulte [[13-AUDITORIA-DO-CODIGO-MAIN]].
+A versão 1.1.0 inclui o painel Master SaaS, planos, licenças, bloqueio em camadas e atualização por Realtime. A validação local final deve ser registrada em [[13-AUDITORIA-DO-CODIGO-MAIN]]. A migration 009, o Realtime e o RLS multi-tenant ainda precisam ser testados no Supabase de destino.

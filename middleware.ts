@@ -33,7 +33,10 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
   const pathname = request.nextUrl.pathname;
   const protectedPath =
-    pathname.startsWith('/operacao') || pathname.startsWith('/admin') || pathname === '/alterar-senha';
+    pathname.startsWith('/operacao') ||
+    pathname.startsWith('/admin') ||
+    pathname.startsWith('/master') ||
+    pathname === '/alterar-senha';
 
   if (protectedPath && !user) {
     const url = request.nextUrl.clone();
@@ -44,9 +47,23 @@ export async function middleware(request: NextRequest) {
   if (user) {
     const { data: profile } = await supabase
       .from('profiles')
-      .select('role,active,must_change_password')
+      .select('role,active,must_change_password,organization_id')
       .eq('id', user.id)
       .maybeSingle();
+
+    const { data: platformMembership } = await supabase
+      .from('platform_users')
+      .select('user_id')
+      .eq('user_id', user.id)
+      .eq('active', true)
+      .maybeSingle();
+    const platformAdmin = isPlatformAdmin(user.id) || Boolean(platformMembership);
+
+    if (pathname.startsWith('/master') && !platformAdmin) {
+      const url = request.nextUrl.clone();
+      url.pathname = profile?.role === 'operator' ? '/operacao' : '/admin';
+      return NextResponse.redirect(url);
+    }
 
     if (profile?.must_change_password && pathname !== '/alterar-senha') {
       const url = request.nextUrl.clone();
@@ -55,10 +72,25 @@ export async function middleware(request: NextRequest) {
     }
 
     if (protectedPath && (!profile || !profile.active)) {
-      if (pathname === '/admin/estacionamentos' && isPlatformAdmin(user.id)) return response;
+      if ((pathname === '/admin/estacionamentos' || pathname.startsWith('/master')) && platformAdmin)
+        return response;
       const url = request.nextUrl.clone();
       url.pathname = '/login';
       return NextResponse.redirect(url);
+    }
+
+    if (profile && !platformAdmin && pathname !== '/alterar-senha') {
+      const { data: license } = await supabase
+        .from('organization_licenses')
+        .select('status,expires_at')
+        .eq('organization_id', profile.organization_id)
+        .maybeSingle();
+      const expired = !license?.expires_at || new Date(license.expires_at).getTime() <= Date.now();
+      if (!license || license.status !== 'active' || expired) {
+        const url = request.nextUrl.clone();
+        url.pathname = '/licenca-bloqueada';
+        return NextResponse.redirect(url);
+      }
     }
 
     if (pathname.startsWith('/admin')) {
@@ -85,5 +117,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/operacao/:path*', '/admin/:path*', '/alterar-senha'],
+  matcher: ['/operacao/:path*', '/admin/:path*', '/master/:path*', '/alterar-senha'],
 };

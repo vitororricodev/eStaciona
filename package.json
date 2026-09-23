@@ -1,6 +1,6 @@
 {
   "name": "estaciona-mvp",
-  "version": "1.0.12",
+  "version": "1.1.0",
   "private": true,
   "overrides": {
     "postcss": "8.5.28"
