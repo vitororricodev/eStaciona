@@ -40,7 +40,7 @@ export default function MasterPage() {
         <div>
           <p className="text-xs font-black uppercase tracking-[0.18em] text-brand-600">Gestão SaaS</p>
           <h1 className="text-3xl font-black">Painel Master</h1>
-          <p className="mt-1 text-slate-500">Licenças, planos e clientes da plataforma.</p>
+          <p className="mt-1 text-slate-500">Estacionamentos, usuários, licenças e planos da plataforma.</p>
         </div>
       </div>
 

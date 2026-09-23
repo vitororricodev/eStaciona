@@ -17,6 +17,10 @@
 - Licença é validada por middleware, APIs, RLS e RPCs.
 - Vitor e Levi são isentos porque administram a plataforma, não porque possuem licença especial.
 - Supabase Realtime bloqueia/libera telas abertas; polling de contingência evita depender apenas do canal.
+- Gestão Master de usuários valida organização e usuário no servidor antes de usar Auth Admin.
+- E-mails vêm do Supabase Auth; senhas provisórias nunca são persistidas em tabelas ou auditoria.
+- Exclusão/rebaixamento do último proprietário ativo é bloqueada no backend.
+- Inclusão, edição, exclusão e redefinição de senha pelo Master geram auditoria da plataforma.
 
 ## Matriz resumida
 

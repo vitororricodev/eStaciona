@@ -7,8 +7,6 @@ import { LogoutButton } from '@/components/LogoutButton';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LicenseGuard } from '@/components/LicenseGuard';
 
-const roots = new Set(['/admin', '/operacao', '/master']);
-
 function fallbackFor(pathname: string) {
   if (pathname.startsWith('/admin/')) return '/admin';
   if (pathname.startsWith('/operacao/')) return '/operacao';
@@ -27,9 +25,6 @@ export function AppShell({
   action?: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const showBack =
-    !roots.has(pathname) &&
-    (pathname.startsWith('/admin/') || pathname.startsWith('/operacao/') || pathname.startsWith('/cliente/'));
   return (
     <main className="min-h-screen bg-slate-50 pb-[max(1.5rem,env(safe-area-inset-bottom))] dark:bg-slate-950 dark:text-slate-100">
       <LicenseGuard />
@@ -49,11 +44,9 @@ export function AppShell({
         </div>
       </header>
       <div className="mx-auto min-w-0 max-w-6xl overflow-x-hidden px-3 py-5 sm:px-6 sm:py-6">
-        {showBack && (
-          <div className="mb-4">
-            <BackButton fallback={fallbackFor(pathname)} />
-          </div>
-        )}
+        <div className="mb-4">
+          <BackButton fallback={fallbackFor(pathname)} />
+        </div>
         {children}
       </div>
     </main>

@@ -5,7 +5,7 @@
 1. Use Node.js compatível com Next.js 15.
 2. Copie `.env.example` para o ambiente local e preencha somente segredos próprios.
 3. Execute `npm ci`.
-4. Aplique as migrations 001–009 em ordem em um Supabase de desenvolvimento.
+4. Aplique as migrations 001–010 em ordem em um Supabase de desenvolvimento.
 5. Execute `npm run verify`.
 
 ## Scripts

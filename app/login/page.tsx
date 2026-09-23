@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { BrandLogo } from '@/components/BrandLogo';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { BackButton } from '@/components/BackButton';
 
 export default function LoginPage() {
   const [error, setError] = useState('');
@@ -52,6 +53,9 @@ export default function LoginPage() {
   }
   return (
     <main className="grid min-h-screen place-items-center bg-gradient-to-b from-brand-50 to-white p-4 dark:from-slate-950 dark:to-slate-900">
+      <div className="fixed left-4 top-4">
+        <BackButton fallback="/" />
+      </div>
       <div className="fixed right-4 top-4">
         <ThemeToggle />
       </div>

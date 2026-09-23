@@ -10,14 +10,16 @@ Consulte `.env.example`. Segredos administrativos e `RATE_LIMIT_SECRET` são ser
 
 ## Banco
 
-Aplicar migrations 001–009 em ordem, primeiro em homologação. Comparar o schema implantado com o repositório, testar rollback operacional e confirmar as RPCs/políticas antes do deploy da aplicação.
+Aplicar migrations 001–010 em ordem, primeiro em homologação. Comparar o schema implantado com o repositório, testar rollback operacional e confirmar as RPCs/políticas antes do deploy da aplicação.
 
 ## Checklist mínimo
 
 - [ ] Variáveis configuradas no ambiente correto.
-- [ ] Migrations 001–009 aplicadas e verificadas em homologação.
+- [ ] Migrations 001–010 aplicadas e verificadas em homologação.
 - [ ] Vitor e Levi configurados por UUID em `PLATFORM_ADMIN_USER_IDS`.
 - [ ] Preços dos planos revisados; a migration 009 começa com valor zero.
+- [ ] Cadastro sem licença e primeira ativação posterior validados pela migration 010.
+- [ ] Gestão Master de usuários validada com contas de homologação.
 - [ ] Licenças iniciais das organizações existentes revisadas.
 - [ ] Bloqueio/liberação e Realtime testados em duas sessões reais.
 - [ ] RLS testada com ao menos dois tenants reais.
@@ -30,4 +32,4 @@ Aplicar migrations 001–009 em ordem, primeiro em homologação. Comparar o sch
 
 ## Estado atual
 
-A versão 1.1.0 foi implementada localmente. A migration 009, o RLS de licença, o Realtime, o deploy Vercel e os testes em dispositivos reais precisam de validação no ambiente de destino.
+A versão 1.1.0 foi implementada localmente. As migrations 009–010, o RLS de licença, o Auth Admin, o Realtime, o deploy Vercel e os testes em dispositivos reais precisam de validação no ambiente de destino.

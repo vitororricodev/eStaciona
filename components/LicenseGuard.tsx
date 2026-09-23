@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Ban, Clock3, ShieldAlert } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { BackButton } from '@/components/BackButton';
 
 type AccessState = {
   exempt?: boolean;
@@ -79,6 +80,9 @@ export function BlockedOverlay({ access }: { access: AccessState }) {
   return (
     <div className="fixed inset-0 z-[100] grid place-items-center bg-slate-950/80 p-4 backdrop-blur-md">
       <section className="w-full max-w-lg rounded-[2rem] bg-white p-7 text-center shadow-2xl dark:bg-slate-900">
+        <div className="mb-4 flex justify-start">
+          <BackButton fallback="/" />
+        </div>
         <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300">
           {icon}
         </span>

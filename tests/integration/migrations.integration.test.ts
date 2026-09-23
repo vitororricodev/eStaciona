@@ -40,4 +40,14 @@ describe('security migration contracts', () => {
     expect(sql).toContain('supabase_realtime');
     expect(sql).toContain('to service_role');
   });
+
+  it('permite cadastrar a organização antes de liberar a primeira licença', () => {
+    const sql = migration('010_separate_organization_and_license_management.sql');
+    expect(sql).toContain("if p_action <> 'activate' then");
+    expect(sql).toContain('insert into public.organization_licenses');
+    expect(sql).toContain('organization_not_found');
+    expect(sql).toContain('license_events');
+    expect(sql).toContain('platform_audit_logs');
+    expect(sql).toContain('to service_role');
+  });
 });

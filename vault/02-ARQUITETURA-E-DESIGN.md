@@ -33,5 +33,8 @@ A versão instalada exata é determinada pelo lockfile, não apenas pelos interv
 - `current_org_id()` só libera o tenant quando a licença está válida.
 - O painel `/master` e suas APIs validam o master no servidor.
 - Mudanças de licença usam RPC atômica, auditoria, Supabase Realtime e polling de contingência.
+- Cadastro de estacionamento/usuários e licenciamento são módulos Master separados.
+- Usuários gerenciados pelo Master continuam vinculados ao Supabase Auth e a `profiles`; senha nunca é armazenada pela aplicação.
+- A primeira licença pode ser ativada depois do cadastro pela RPC atômica atualizada na migration 010.
 
 Consulte [[03-ESTRUTURA-DE-DADOS-E-API]] e [[07-SEGURANCA-AUTENTICACAO-E-ACESSO]].

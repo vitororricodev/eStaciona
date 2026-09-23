@@ -2,6 +2,7 @@
 import { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrandLogo } from '@/components/BrandLogo';
+import { BackButton } from '@/components/BackButton';
 import { CarFront, Search, ShieldCheck } from 'lucide-react';
 export default function ConsultarPage() {
   const router = useRouter();
@@ -29,6 +30,9 @@ export default function ConsultarPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-brand-50 to-white p-4">
       <div className="mx-auto max-w-md pt-8">
+        <div className="mb-5">
+          <BackButton fallback="/" />
+        </div>
         <BrandLogo />
         <div className="mt-8 rounded-[2rem] bg-white p-6 shadow-soft">
           <div className="rounded-2xl bg-brand-50 p-3 text-brand-600 w-fit">

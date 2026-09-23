@@ -33,4 +33,4 @@ Fontes de verdade, em ordem: código e migrations versionados; testes executados
 
 ## Situação da validação
 
-A versão 1.1.0 inclui o painel Master SaaS, planos, licenças, bloqueio em camadas e atualização por Realtime. A validação local final deve ser registrada em [[13-AUDITORIA-DO-CODIGO-MAIN]]. A migration 009, o Realtime e o RLS multi-tenant ainda precisam ser testados no Supabase de destino.
+A versão 1.1.0 inclui o painel Master SaaS, gestão separada de estacionamentos/usuários e licenças, bloqueio em camadas e atualização por Realtime. A validação local final está registrada em [[13-AUDITORIA-DO-CODIGO-MAIN]]. As migrations 009–010, o Realtime e o RLS multi-tenant ainda precisam ser testados no Supabase de destino.

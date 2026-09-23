@@ -3,11 +3,14 @@
 ## Obrigatório
 
 - [ ] Criar projeto Supabase de produção.
-- [ ] Executar migrations 001 a 009, em ordem, e comparar com o schema implantado.
+- [ ] Executar migrations 001 a 010, em ordem, e comparar com o schema implantado.
 - [ ] Confirmar Vitor e Levi por UUID em `PLATFORM_ADMIN_USER_IDS`.
 - [ ] Conferir preços dos planos; a migration cria os três planos com preço inicial zero.
 - [ ] Validar bloqueio/liberação em duas sessões reais e confirmar evento Realtime.
 - [ ] Revisar as licenças iniciais de 30 dias criadas para organizações existentes.
+- [ ] Cadastrar um estacionamento sem licença e depois ativá-lo pelo módulo Licenças.
+- [ ] Testar inclusão, edição, exclusão e redefinição de senha pelo módulo Estacionamentos.
+- [ ] Confirmar que o último proprietário ativo não pode ser removido ou rebaixado.
 - [ ] Criar usuário proprietário e bootstrap da organização.
 - [ ] Configurar `NEXT_PUBLIC_SUPABASE_URL`.
 - [ ] Configurar `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
@@ -44,3 +47,5 @@
 9. Conferir dashboard/relatório.
 10. Fechar caixa e conferir diferença.
 11. Conferir audit log.
+12. Como Master, criar estacionamento, usuário adicional e redefinir senha.
+13. Ativar a primeira licença separadamente e conferir o acesso.

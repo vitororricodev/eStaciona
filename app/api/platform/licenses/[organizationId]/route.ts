@@ -35,6 +35,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ org
         { error: 'A licença expirou. Use Renovar para liberar o acesso.' },
         { status: 409 },
       );
+    if (message.includes('plan_not_found'))
+      return NextResponse.json({ error: 'Selecione um plano ativo para concluir a ação.' }, { status: 400 });
+    if (message.includes('organization_not_found'))
+      return NextResponse.json({ error: 'Estacionamento não encontrado.' }, { status: 404 });
+    if (message.includes('license_not_found'))
+      return NextResponse.json({ error: 'A licença ainda não existe. Use Ativar.' }, { status: 409 });
     return NextResponse.json({ error: 'Não foi possível alterar a licença.' }, { status: 500 });
   }
 

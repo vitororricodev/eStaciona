@@ -95,7 +95,7 @@ export async function middleware(request: NextRequest) {
 
     if (pathname.startsWith('/admin')) {
       const platformOnly = pathname.startsWith('/admin/estacionamentos');
-      if (platformOnly && !isPlatformAdmin(user.id)) {
+      if (platformOnly && !platformAdmin) {
         const url = request.nextUrl.clone();
         url.pathname = profile?.role === 'operator' ? '/operacao' : '/admin';
         return NextResponse.redirect(url);
@@ -105,7 +105,7 @@ export async function middleware(request: NextRequest) {
         url.pathname = '/operacao';
         return NextResponse.redirect(url);
       }
-      if (!platformOnly && !profile && isPlatformAdmin(user.id)) {
+      if (!platformOnly && !profile && platformAdmin) {
         const url = request.nextUrl.clone();
         url.pathname = '/admin/estacionamentos';
         return NextResponse.redirect(url);

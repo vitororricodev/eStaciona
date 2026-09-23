@@ -2,16 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 const items = [
   ['/master', 'Visão geral'],
-  ['/master/clientes', 'Estacionamentos'],
+  ['/master/estacionamentos', 'Estacionamentos'],
+  ['/master/licencas', 'Licenças'],
   ['/master/planos', 'Planos'],
   ['/master/auditoria', 'Auditoria'],
 ] as const;
 
 export function MasterNav() {
   const pathname = usePathname();
+  const activeRef = useRef<HTMLAnchorElement | null>(null);
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }, [pathname]);
   return (
     <nav aria-label="Navegação master" className="mb-6 flex gap-2 overflow-x-auto pb-2">
       {items.map(([href, label]) => {
@@ -19,6 +25,7 @@ export function MasterNav() {
         return (
           <Link
             key={href}
+            ref={active ? activeRef : undefined}
             href={href}
             aria-current={active ? 'page' : undefined}
             className={`shrink-0 rounded-full border px-4 py-2.5 text-sm font-bold transition ${

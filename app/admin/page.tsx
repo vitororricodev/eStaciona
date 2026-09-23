@@ -97,7 +97,7 @@ export default function AdminPage() {
             href="/master"
             icon={<Building2 />}
             title="Painel Master"
-            text="Gerencie clientes SaaS, planos, licenças e auditoria da plataforma."
+            text="Gerencie estacionamentos, usuários, planos, licenças e auditoria da plataforma."
           />
         )}
       </div>

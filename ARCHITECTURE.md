@@ -82,3 +82,5 @@ Não expor `SUPABASE_SERVICE_ROLE_KEY` ao browser.
 O licenciamento pertence à organização e permanece separado de `profiles.active`. `current_profile_org_id()` identifica o tenant autenticado, enquanto `current_org_id()` somente libera dados operacionais quando a licença está ativa e dentro da validade.
 
 O painel `/master` é exclusivo dos UUIDs configurados em `PLATFORM_ADMIN_USER_IDS` ou registrados em `platform_users`. Alterações de licença usam a RPC `manage_organization_license_atomic`, geram auditoria e são propagadas por Supabase Realtime. APIs, RLS e interface validam a licença em camadas.
+
+Cadastro e licenciamento são fluxos independentes: `/master/estacionamentos` provisiona a organização e administra usuários; `/master/licencas` ativa e mantém o contrato comercial. A migration 010 permite que a primeira licença seja criada posteriormente pela mesma RPC atômica, sem acoplar o cadastro ao plano.

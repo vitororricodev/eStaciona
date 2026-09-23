@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { CarFront, Clock3, QrCode as QrIcon, CheckCircle2, ReceiptText } from 'lucide-react';
 import { formatDuration } from '@/domain/pricing';
+import { BackButton } from '@/components/BackButton';
 export default function ClientePage({ params }: { params: Promise<{ token: string }> }) {
   const [token, setToken] = useState('');
   const [data, setData] = useState<any>(null);
@@ -36,8 +37,13 @@ export default function ClientePage({ params }: { params: Promise<{ token: strin
     );
   if (!data)
     return (
-      <main className="grid min-h-screen place-items-center bg-brand-50">
-        <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
+      <main className="min-h-screen bg-brand-50 p-4">
+        <div className="mx-auto max-w-md">
+          <BackButton fallback="/consultar" />
+        </div>
+        <div className="grid min-h-[70vh] place-items-center">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-200 border-t-brand-600" />
+        </div>
       </main>
     );
   const v = data.stay.vehicles;
@@ -46,6 +52,9 @@ export default function ClientePage({ params }: { params: Promise<{ token: strin
   return (
     <main className="min-h-screen bg-gradient-to-b from-brand-50 to-white p-4 sm:py-10">
       <div className="mx-auto max-w-md">
+        <div className="mb-5">
+          <BackButton fallback="/consultar" />
+        </div>
         <div className="mb-5 flex items-center gap-3">
           <span className="rounded-2xl bg-brand-600 p-3 text-white">
             <CarFront />
@@ -161,6 +170,9 @@ function State({ title, text }: { title: string; text: string }) {
   return (
     <main className="grid min-h-screen place-items-center bg-brand-50 p-5">
       <div className="max-w-md rounded-3xl bg-white p-7 text-center shadow-soft">
+        <div className="mb-5 flex justify-start">
+          <BackButton fallback="/consultar" />
+        </div>
         <h1 className="text-2xl font-black">{title}</h1>
         <p className="mt-2 text-slate-500">{text}</p>
         <a

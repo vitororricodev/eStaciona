@@ -9,7 +9,6 @@ const schema = z.object({
   ownerName: z.string().min(2).max(80),
   email: z.string().email(),
   temporaryPassword: z.string().min(8).max(72),
-  planId: z.string().uuid(),
 });
 
 function slugify(value: string) {
@@ -22,6 +21,20 @@ function slugify(value: string) {
       .replace(/^-|-$/g, '')
       .slice(0, 45) || 'estacionamento'
   );
+}
+
+async function listAuthEmails(admin: ReturnType<typeof createAdminClient>) {
+  const emails = new Map<string, string | null>();
+  const perPage = 1000;
+
+  for (let page = 1; page <= 100; page += 1) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage });
+    if (error) throw error;
+    for (const user of data.users) emails.set(user.id, user.email || null);
+    if (data.users.length < perPage) break;
+  }
+
+  return emails;
 }
 
 export async function GET() {
@@ -39,17 +52,31 @@ export async function GET() {
   if (error)
     return NextResponse.json({ error: 'Não foi possível carregar os estacionamentos.' }, { status: 500 });
 
-  const { data: owners, error: ownersError } = await admin
+  const { data: profiles, error: profilesError } = await admin
     .from('profiles')
-    .select('organization_id,name,role,active')
-    .eq('role', 'owner');
+    .select('id,organization_id,name,role,active,must_change_password,created_at')
+    .order('created_at', { ascending: true });
 
-  if (ownersError)
-    return NextResponse.json({ error: 'Não foi possível carregar os proprietários.' }, { status: 500 });
+  if (profilesError)
+    return NextResponse.json({ error: 'Não foi possível carregar os usuários.' }, { status: 500 });
+
+  let authEmails: Map<string, string | null>;
+  try {
+    authEmails = await listAuthEmails(admin);
+  } catch {
+    return NextResponse.json(
+      { error: 'Não foi possível carregar os e-mails dos usuários.' },
+      { status: 500 },
+    );
+  }
+  const usersWithEmail = (profiles || []).map((profile) => ({
+    ...profile,
+    email: authEmails.get(profile.id) || null,
+  }));
 
   const rows = (organizations || []).map((organization) => ({
     ...organization,
-    profiles: (owners || []).filter((owner) => owner.organization_id === organization.id),
+    profiles: usersWithEmail.filter((profile) => profile.organization_id === organization.id),
   }));
 
   return NextResponse.json({ organizations: rows });
@@ -85,19 +112,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data: provisioned, error: provisionError } = await admin.rpc(
-    'provision_organization_with_license_atomic',
-    {
-      p_owner_user_id: authData.user.id,
-      p_organization_name: parsed.data.organizationName,
-      p_slug: slug,
-      p_owner_name: parsed.data.ownerName,
-      p_plan_id: parsed.data.planId,
-      p_actor_user_id: context.user.id,
-    },
-  );
+  const { data: organization, error: provisionError } = await admin.rpc('provision_organization_atomic', {
+    p_owner_user_id: authData.user.id,
+    p_organization_name: parsed.data.organizationName,
+    p_slug: slug,
+    p_owner_name: parsed.data.ownerName,
+  });
 
-  if (provisionError || !provisioned) {
+  if (provisionError || !organization) {
     const { error: compensationError } = await admin.auth.admin.deleteUser(authData.user.id);
     return NextResponse.json(
       {
@@ -109,11 +131,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  await admin.from('platform_audit_logs').insert({
+    actor_user_id: context.user.id,
+    action: 'organization.created',
+    entity: 'organization',
+    entity_id: organization.id,
+    metadata: {
+      organization_name: organization.name,
+      owner_user_id: authData.user.id,
+      owner_email: parsed.data.email,
+      license_created: false,
+    },
+  });
+
   return NextResponse.json(
     {
       ok: true,
-      organization: provisioned.organization,
-      license: provisioned.license,
+      organization,
       owner: { id: authData.user.id, email: parsed.data.email, mustChangePassword: true },
     },
     { status: 201 },

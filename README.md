@@ -49,7 +49,11 @@ SaaS mobile-first para estacionamentos, preparado para **Vercel + Supabase**.
 ### eStaciona Master SaaS
 
 - painel exclusivo para administradores da plataforma;
-- clientes SaaS ativos, bloqueados, expirados e pendentes;
+- módulos separados para estacionamentos/usuários e licenças;
+- visualização dos e-mails cadastrados no Supabase Auth;
+- inclusão, edição, ativação, exclusão e redefinição de senha dos usuários de cada estacionamento;
+- proteção contra remoção ou rebaixamento do último proprietário ativo;
+- licenças ativas, bloqueadas, expiradas e pendentes;
 - planos mensal (30 dias), semestral (180 dias) e anual (365 dias);
 - liberação, renovação, troca de plano e bloqueio auditado;
 - bloqueio server-side e no banco, refletido em sessões abertas por Supabase Realtime;
@@ -114,13 +118,14 @@ Execute **nesta ordem** em um projeto Supabase novo:
 7. `supabase/migrations/007_atomic_operations_and_tariff_snapshot.sql`
 8. `supabase/migrations/008_security_rls_rate_limit_and_provisioning.sql`
 9. `supabase/migrations/009_saas_licensing_and_master_panel.sql`
+10. `supabase/migrations/010_separate_organization_and_license_management.sql`
 
 Em instalações existentes, aplique somente as migrations ainda não registradas, sempre na ordem numérica e primeiro em homologação.
 
 ## Primeiro acesso
 
 1. Crie o projeto no Supabase.
-2. Rode as 9 migrations, em ordem numérica.
+2. Rode as 10 migrations, em ordem numérica.
 3. Crie o primeiro usuário em **Authentication > Users**.
 4. Rode o bootstrap comentado no fim de `001_initial.sql` para criar organização, perfil `owner` e tarifa padrão.
 5. Configure `.env.local` a partir de `.env.example`.
@@ -165,7 +170,7 @@ Antes de colocar clientes reais:
 
 ## Versão
 
-`1.1.0` — versão final do módulo SaaS; a migration 009 ainda precisa ser aplicada no banco de destino.
+`1.1.0` — versão final do módulo SaaS; as migrations 009 e 010 ainda precisam ser validadas no banco de destino.
 
 ## Rate limiting
 

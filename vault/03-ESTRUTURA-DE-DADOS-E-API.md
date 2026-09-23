@@ -13,8 +13,9 @@ Aplicar em ordem, primeiro em homologação:
 7. `007_atomic_operations_and_tariff_snapshot.sql`
 8. `008_security_rls_rate_limit_and_provisioning.sql`
 9. `009_saas_licensing_and_master_panel.sql`
+10. `010_separate_organization_and_license_management.sql`
 
-As migrations 007–009 são obrigatórias para a versão 1.1.0. O schema implantado deve ser comparado antes do rollout.
+As migrations 007–010 são obrigatórias para a versão 1.1.0 final. O schema implantado deve ser comparado antes do rollout.
 
 ## Estruturas novas/relevantes
 
@@ -36,6 +37,7 @@ As migrations 007–009 são obrigatórias para a versão 1.1.0. O schema implan
 - `consume_rate_limit`: aplica janela/limite de forma persistente.
 - `provision_organization_with_license_atomic`: cria organização e licença inicial na mesma transação.
 - `manage_organization_license_atomic`: bloqueia, libera, renova ou troca plano com auditoria.
+- Na migration 010, `manage_organization_license_atomic` também cria atomicamente a primeira licença de uma organização já cadastrada.
 - `organization_license_status`: calcula expiração usando o horário do servidor.
 
 ## Contratos de API
@@ -43,3 +45,12 @@ As migrations 007–009 são obrigatórias para a versão 1.1.0. O schema implan
 Toda rota privada deve autenticar, resolver papel/organização no servidor, validar entrada e devolver o mínimo necessário. Rotas públicas devem usar respostas uniformes, rate limit e jamais retornar dados pessoais ou administrativos.
 
 Mudanças de schema exigem migration incremental, teste de contrato e atualização deste arquivo.
+
+## Administração Master de organizações e usuários
+
+- `POST /api/platform/organizations`: cria organização, proprietário e tarifa padrão sem liberar licença automaticamente.
+- `PATCH /api/platform/organizations/[organizationId]`: edita o nome do estacionamento.
+- `/api/platform/organizations/[organizationId]/users`: lista e inclui usuários com e-mail do Supabase Auth.
+- `/api/platform/organizations/[organizationId]/users/[userId]`: edita nome, e-mail, papel e situação, ou exclui o usuário.
+- `/api/platform/organizations/[organizationId]/users/[userId]/password`: redefine senha provisória e exige troca no próximo acesso.
+- Todas essas rotas exigem Master no servidor e registram `platform_audit_logs`; o último proprietário ativo não pode ser removido ou rebaixado.

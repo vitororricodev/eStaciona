@@ -27,6 +27,7 @@ Execute no Supabase, nesta ordem:
 7. `supabase/migrations/007_atomic_operations_and_tariff_snapshot.sql`
 8. `supabase/migrations/008_security_rls_rate_limit_and_provisioning.sql`
 9. `supabase/migrations/009_saas_licensing_and_master_panel.sql`
+10. `supabase/migrations/010_separate_organization_and_license_management.sql`
 
 ## Build
 
@@ -39,4 +40,4 @@ Na Vercel use os padrões do Next.js:
 
 ## Observação
 
-A versão 1.0.4 inclui correções de tipagem para Vercel, hardening de RLS, resolução correta de perfil multiusuário e finalização/pagamento atômicos.
+A versão 1.1.0 exige as migrations 009 e 010 para o painel Master, licenciamento e separação entre cadastro de estacionamento e ativação comercial.

@@ -17,7 +17,9 @@
 ## Master SaaS
 
 - `/master` apresenta indicadores de organizações ativas, bloqueadas, expiradas e pendentes.
-- `/master/clientes` cadastra estacionamentos com plano inicial e controla licença.
+- `/master/estacionamentos` cadastra estacionamentos sem acoplar plano e administra seus usuários.
+- O Master visualiza e edita e-mails, nomes, papéis e situação; pode incluir, excluir e redefinir senhas provisórias.
+- `/master/licencas` ativa a primeira licença e controla renovação, bloqueio, liberação e troca de plano.
 - `/master/planos` mantém duração, preço e disponibilidade dos planos.
 - `/master/auditoria` apresenta ações administrativas da plataforma.
 - Bloqueio e liberação são persistidos atomicamente e propagados às sessões abertas.
@@ -27,6 +29,7 @@
 - Login via Supabase.
 - Troca obrigatória de senha concluída por rota/RPC server-side.
 - Logout e navegação adaptados a desktop e mobile.
+- Botão Voltar reutilizável aparece de forma consistente nas telas secundárias e raízes dos módulos.
 
 ## Consulta pública
 

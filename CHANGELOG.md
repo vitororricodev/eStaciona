@@ -8,6 +8,11 @@
 - Vitor e Levi permanecem sem validade por serem administradores da plataforma identificados por UUID.
 - Migration `009_saas_licensing_and_master_panel.sql`, testes e Vault atualizados.
 - Organizações existentes recebem licença mensal inicial de 30 dias para evitar interrupção durante o rollout.
+- Cadastro de estacionamentos e gestão de licenças separados em módulos próprios.
+- Master pode visualizar e-mails, adicionar, editar, ativar, excluir e redefinir a senha de usuários dos estacionamentos.
+- Último proprietário ativo protegido contra remoção/rebaixamento; ações Master registradas em auditoria.
+- Botão Voltar padronizado, home compactada e bloco redundante “3 fluxos” removido.
+- Migration `010_separate_organization_and_license_management.sql` permite primeira ativação após o cadastro.
 
 # 1.0.12 — não publicado
 

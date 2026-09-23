@@ -26,3 +26,12 @@ O build e a análise estática foram executados, mas ainda é necessário valida
 - Listas pesquisáveis, filtros de situação e ações com feedback.
 - Bloqueio em overlay sem recarregar a página.
 - Ações sensíveis exigem motivo e registram auditoria.
+
+## Padronização final 1.1.0
+
+- `BackButton` foi aplicado de forma consistente aos módulos Operação, Gestão e Master, além de login e consulta pública.
+- As raízes `/operacao`, `/admin` e `/master` também oferecem retorno para a home.
+- A home foi compactada e o selo “Mobile-first para estacionamentos” foi removido.
+- O bloco repetido “3 fluxos. 1 operação conectada” foi removido; permanece um único conjunto de módulos clicáveis.
+- O painel Master separa “Estacionamentos” de “Licenças”, reduzindo mistura entre cadastro técnico e controle comercial.
+- Formulários administrativos exibem estados de sucesso/erro; exclusão de usuário exige confirmação.
